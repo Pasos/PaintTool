@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
@@ -45,11 +46,11 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 
 	private static final long serialVersionUID = 2L;
 	
-	public int oldx, oldy;
+	public int oldx, oldy, tentenphase;
 	public static int x1, x2, y1, y2, curvex, curvey, curvex2, curvey2, arcx1, arcy1, arcx2, arcy2, imgnum = 0, startimg = 0, endimg = 0, start2img = 0, end2img = 0,pcnt = 0, pcnt2 = 0, move = 0, setx1, setx2, sety1, sety2, ssetx1, ssety1, rotatex2, rotatey2, originalrotate = 0, copyx, copyy, distancecount;
-	public int[] x3, y3, x4 ,y4, curvesize;
-	public boolean[] curveside;
+	public int[] x3, y3, x4 ,y4, curvesize, curveside;
 	public float[] curvetrans;
+	public float[][] curvepattern;
 	public boolean off = false, regular = false, press = false, presstmp, clock = false, exit = false, clockswitch = false, reaverelease = false;
 	public static boolean set = false, dontfill = false, capt = false, debug = false, rectcapt = false, stampset = false, pointset = false, readyarc = false;
 	public static boolean[] sets, setchange;
@@ -75,7 +76,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 	}
 	
 	
-	
+	//ネガポジ変換
 	public BufferedImage negaposi(BufferedImage img){
 		for(int y = 0; y < img.getHeight(); y++){
 			for(int x = 0; x < img.getWidth(); x++){
@@ -87,6 +88,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		return img;
 	}
 	
+	//選択範囲開放処理
 	void leaveArea(){
 		set = false;
 		sets[imgnum] = false;
@@ -123,6 +125,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 	}
 	
+	
+	//名前をつけて保存
 	void save() {
 		JFrame jFrame = new JFrame();
 		FileDialog flDialog = new FileDialog(jFrame,"ファイルを保存する");
@@ -172,7 +176,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		flDialog.dispose();
 		jFrame.dispose();
 	}
-
+	
+	//上書き保存
 	void save2() {
 		try {
 			file = new File(filepass);
@@ -229,7 +234,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		flDialog.dispose();
 		jFrame.dispose();
 	}
-
+	
+	//選択範囲の画像をキャンパスに転写
 	void selectRectDraw() {
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, SelectOptionFrame.gettrans()));
 		Area are = new Area(shap);
@@ -245,6 +251,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		g2.setClip(null);
 	}
 
+	
 	public void capture() {
 		Area are = new Area(shap);
 		AffineTransform tran = new AffineTransform();
@@ -434,6 +441,56 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 	}
 	
+	void setStroke(Graphics2D g){
+		float[] pattern = PaintTool.p15.getpattern();
+		int size;
+		switch(PaintTool.getType()){
+		case 0:
+			size = PaintTool.getsize();
+			break;
+		case 1:
+			size = PaintTool.getsize4();
+			break;
+		case 3:
+			size = PaintTool.getsize4();
+			break;
+		case 5:
+			size = PaintTool.getsize();
+			break;
+		case 6:
+			size = PaintTool.getsize4();
+			break;
+		case 10:
+			size = PaintTool.getsize();
+			break;
+		case 13:
+			size = PaintTool.getsize();
+			break;
+		case 18:
+			size = PaintTool.getsize4();
+			break;
+		case 20:
+			size = PaintTool.getsize4();
+			break;
+		case 23:
+			size = PaintTool.getsize4();
+			break;
+		case 25:
+			size = PaintTool.getsize();
+			break;
+		default:
+			size = PaintTool.getsize();
+			break;
+		}
+		
+		if(pattern[0] == 0 && pattern.length == 1){
+			g.setStroke(new BasicStroke(size, PaintTool.p15.getborder(), BasicStroke.JOIN_MITER));
+		}else{
+			g.setStroke(new BasicStroke(size, PaintTool.p15.getborder(), BasicStroke.JOIN_MITER, 1.0f, pattern, 0.0f));
+		}
+	}
+	
+	//選択範囲形作成
 	void makeShap(){
 		int r1, gr1, b1;
 		b1 = img[imgnum].getRGB(x1, y1) & 0xff;
@@ -1259,8 +1316,9 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		y4 = new int[1000000];
 		curvetrans = new float[100];
 		curvesize = new int[100];
-		curveside = new boolean[100];
+		curveside = new int[100];
 		curvecolor = new Color[100];
+		curvepattern = new float[100][4];
 		img = new BufferedImage[PaintTool.HistoryNUM];
 		shaps = new Shape[PaintTool.HistoryNUM];
 		setchange = new boolean[PaintTool.HistoryNUM];
@@ -1852,11 +1910,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
 					g3.setColor(PaintTool.getColor());
 					g3.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-					if(ToolPanel.rb8.isSelected()){
-						g3.setStroke(new BasicStroke(PaintTool.getsize(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
-					}else{
-						g3.setStroke(new BasicStroke(PaintTool.getsize(),BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
-					}
+					setStroke(g3);
 					g3.translate(0.5, 0.5);
 					g3.drawLine(x1, y1, x2, y2);
 					g3.translate(-0.5, -0.5);
@@ -1864,11 +1918,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					if(regular){
 						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
 						g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-						if(ToolPanel.rb8.isSelected()){
-							g2.setStroke(new BasicStroke(PaintTool.getsize(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
-						}else{
-							g2.setStroke(new BasicStroke(PaintTool.getsize(),BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
-						}
+						setStroke(g2);
 						g2.drawLine(x1, y1, x2, y2);
 					}
 				}
@@ -1892,7 +1942,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					g3.translate(0.5, 0.5);
 					g3.rotate(-PaintTool.getsize3()*Math.PI/180, x1, y1);
 					g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-					g3.setStroke(new BasicStroke(PaintTool.getsize4()));
+					setStroke(g3);
 					if(ToolPanel.rb1.isSelected()){
 						g3.drawRect((x1 < x2) ? x1 : x2, (y1 < y2) ? y1 : y2, Math
 								.abs(x1 - x2), Math.abs(y1 - y2));
@@ -1939,7 +1989,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				} else {
 					if(regular){
 						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-						g2.setStroke(new BasicStroke(PaintTool.getsize4()));
+						setStroke(g2);
 						g2.rotate(-PaintTool.getsize3()*Math.PI/180, x1, y1);
 						if(ToolPanel.rb1.isSelected()){
 							g2.drawRect((x1 < x2) ? x1 : x2, (y1 < y2) ? y1 : y2, Math
@@ -2077,7 +2127,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					g3.translate(0.5, 0.5);
 					//g3.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 					g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-					g3.setStroke(new BasicStroke(PaintTool.getsize4()));
+					setStroke(g3);
 					g3.rotate(-PaintTool.getsize3()*Math.PI/180, x1, y1);
 					if(ToolPanel.rb1.isSelected()){
 						g3.drawOval((x1 < x2) ? x1 : x2, (y1 < y2) ? y1 : y2, Math
@@ -2125,7 +2175,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					if(regular){
 						//g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-						g2.setStroke(new BasicStroke(PaintTool.getsize4()));
+						setStroke(g2);
 						g2.rotate(-PaintTool.getsize3()*Math.PI/180, x1, y1);
 						if(ToolPanel.rb1.isSelected()){
 							g2.drawOval((x1 < x2) ? x1 : x2, (y1 < y2) ? y1 : y2, Math
@@ -2316,55 +2366,124 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 
 			} else if (PaintTool.type == 5) { // 線
-				if(press && (regular || clock)){
-					debug =true;
-					g3.drawImage(img[imgnum], 0, 0, this);
-					if(set){
-						if((SelectOptionFrame.rb3.isSelected())){
-							g3.clip(maskare);
-						} else if((SelectOptionFrame.rb4.isSelected())){
-							g3.clip(maskare2);
+				if(PaintTool.p15.getpattern()[0] == 0 && PaintTool.p15.getpattern().length == 1){//点線かどうか
+					if(press && (regular || clock)){
+						debug =true;
+						g3.drawImage(img[imgnum], 0, 0, this);
+						if(set){
+							if((SelectOptionFrame.rb3.isSelected())){
+								g3.clip(maskare);
+							} else if((SelectOptionFrame.rb4.isSelected())){
+								g3.clip(maskare2);
+							}
 						}
-					}
-					if(imgtemp == null){
-						imgtemp = new BufferedImage(img[imgnum].getWidth(), img[imgnum].getHeight(), BufferedImage.TYPE_INT_RGB);
-						Graphics2D g4 = imgtemp.createGraphics();
-						g4.drawImage(img[imgnum], 0, 0, this);//一時imgin保存
-					}
-					if(!clock){
+						if(imgtemp == null){
+							imgtemp = new BufferedImage(img[imgnum].getWidth(), img[imgnum].getHeight(), BufferedImage.TYPE_INT_RGB);
+							Graphics2D g4 = imgtemp.createGraphics();
+							g4.drawImage(img[imgnum], 0, 0, this);//一時imgin保存
+						}
+						if(!clock){
+							Graphics2D g4 = imgtemp.createGraphics();
+							g4.setColor(PaintTool.getColor());
+							g4.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+							g4.setStroke(new BasicStroke(PaintTool.getsize(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+							g4.drawLine(x1, y1, x1, y1);
+							if (oldx >= -999) {
+								g4.drawLine(x1, y1, oldx, oldy);
+							}
+							oldx = x1;
+							oldy = y1;
+						}
+						g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
+						g3.drawImage(imgtemp, 0, 0, this);
+					} else if(!press && regular && imgtemp != null){
 						Graphics2D g4 = imgtemp.createGraphics();
 						g4.setColor(PaintTool.getColor());
 						g4.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-						g4.setStroke(new BasicStroke(PaintTool.getsize(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+						setStroke(g4);
 						g4.drawLine(x1, y1, x1, y1);
 						if (oldx >= -999) {
 							g4.drawLine(x1, y1, oldx, oldy);
 						}
-						oldx = x1;
-						oldy = y1;
+						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
+						g2.drawImage(imgtemp, 0, 0, this);
+						oldx = -1000;
+						oldy = -1000;
+						imgtemp = null;
 					}
-					g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-					g3.drawImage(imgtemp, 0, 0, this);
-				} else if(!press && regular && imgtemp != null){
-					Graphics2D g4 = imgtemp.createGraphics();
-					g4.setColor(PaintTool.getColor());
-					g4.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-					g4.setStroke(new BasicStroke(PaintTool.getsize(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
-					g4.drawLine(x1, y1, x1, y1);
-					if (oldx >= -999) {
-						g4.drawLine(x1, y1, oldx, oldy);
+				}else{//点線
+					if(press && (regular || clock)){
+						debug =true;
+						g3.drawImage(img[imgnum], 0, 0, this);
+						if(set){
+							if((SelectOptionFrame.rb3.isSelected())){
+								g3.clip(maskare);
+							} else if((SelectOptionFrame.rb4.isSelected())){
+								g3.clip(maskare2);
+							}
+						}
+						if(imgtemp == null){//書き始め
+							imgtemp = new BufferedImage(img[imgnum].getWidth(), img[imgnum].getHeight(), BufferedImage.TYPE_INT_RGB);
+							Graphics2D g4 = imgtemp.createGraphics();
+							g4.drawImage(img[imgnum], 0, 0, this);//一時imgin保存
+							tentenphase = 0;
+						}
+						if(!clock){
+							Graphics2D g4 = imgtemp.createGraphics();
+							g4.setColor(PaintTool.getColor());
+							g4.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+							if (oldx > -1000) {
+								g4.setStroke(new BasicStroke(PaintTool.getsize(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+								int tmp  = Math.round(PaintTool.getsize() * PaintTool.p15.getpattern()[tentenphase]) - (distancecount + (x1-oldx)*(x1-oldx) + (y1-oldy)*(y1-oldy));
+								while(tmp < 0){
+									tmp = Math.round(PaintTool.getsize() * PaintTool.p15.getpattern()[tentenphase]) - distancecount;
+									x2 = oldx + (int)Math.round((x1-oldx)*(Math.sqrt(tmp)/Math.sqrt((x1-oldx)*(x1-oldx)+(y1-oldy)*(y1-oldy))));
+									y2 = oldy + (int)Math.round((y1-oldy)*(Math.sqrt(tmp)/Math.sqrt((x1-oldx)*(x1-oldx)+(y1-oldy)*(y1-oldy))));
+									if(!off)g4.drawLine(oldx, oldy, x2, y2);
+									oldx = x2;
+									oldy = y2;
+									off = !off;
+									if(PaintTool.p15.getpattern().length == 4){
+										if(tentenphase < 3){
+											tentenphase++;
+										}else{
+											tentenphase = 0;
+										}
+									}else if(PaintTool.p15.getpattern().length == 2){
+										if(tentenphase == 0){
+											tentenphase++;
+										}else{
+											tentenphase = 0;
+										}
+									}
+									distancecount = 0;
+									tmp  = Math.round(PaintTool.getsize() * PaintTool.p15.getpattern()[tentenphase]) - (distancecount + (x1-oldx)*(x1-oldx) + (y1-oldy)*(y1-oldy));
+								}
+								if(!off)g4.drawLine(oldx, oldy, x1, y1);
+								g4.setStroke(new BasicStroke(1,BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+								distancecount += (x1-oldx)*(x1-oldx) + (y1-oldy)*(y1-oldy);
+								oldx = x1;
+								oldy = y1;
+							}
+						}
+						g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
+						g3.drawImage(imgtemp, 0, 0, this);
+					} else if(!press && regular && imgtemp != null){//線確定
+						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
+						g2.drawImage(imgtemp, 0, 0, this);
+						oldx = -1000;
+						oldy = -1000;
+						off = false;
+						tentenphase = 0;
+						imgtemp = null;
 					}
-					g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-					g2.drawImage(imgtemp, 0, 0, this);
-					oldx = -1000;
-					oldy = -1000;
-					imgtemp = null;
 				}
 			} else if (PaintTool.type == 6) {// 多角形
 				if(press){
 					debug = true;
 					g3.drawImage(img[imgnum], 0, 0, this);
 					g3.translate(0.5, 0.5);
+					setStroke(g3);
 					if(pcnt+1>0)g3.drawPolygon(x3,y3,pcnt+1);
 					for(int i = 0;i<pcnt+1;i++){
 						g3.drawOval(x3[i] - 2, y3[i] - 2, 4, 4);
@@ -2375,6 +2494,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					debug = true;
 					g3.drawImage(img[imgnum], 0, 0, this);
 					g3.translate(0.5, 0.5);
+					setStroke(g3);
 					if(pcnt>0)g3.drawPolygon(x3,y3,pcnt);
 					for(int i = 0;i<pcnt;i++){
 						g3.drawOval(x3[i] - 2, y3[i] - 2, 4, 4);
@@ -2385,7 +2505,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					if (pcnt > 2) {
 						g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-						g2.setStroke(new BasicStroke(PaintTool.getsize4()));
+						setStroke(g2);
 						g2.drawPolygon(x3, y3, pcnt);
 					}
 					pcnt = 0;
@@ -2426,14 +2546,14 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					g3.drawImage(img[imgnum], 0, 0, this);
 					g3.translate(0.5, 0.5);
 					g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-					g3.setStroke(new BasicStroke(PaintTool.getsize4()));
+					setStroke(g3);
 					if(pcnt>0)g3.drawPolygon(x4, y4, pcnt);
 					g3.translate(-0.5, -0.5);
 				} else {
 					if (pcnt > 2) {
 						g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-						g2.setStroke(new BasicStroke(PaintTool.getsize4()));
+						setStroke(g2);
 						g2.drawPolygon(x4, y4, pcnt);
 					}
 					pcnt = 0;
@@ -2525,32 +2645,20 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 						f = new Font(PaintTool.getfont(), Font.BOLD, PaintTool
 								.getMozisize());
 					}
-					int sum = 0;
-					for(int i = 0;i<PaintTool.getMozi().length();i++){
-						char c = PaintTool.getMozi().charAt(i);
-						 if( ( c<='\u007e' )|| // 英数字
-					                ( c=='\u00a5' )|| // \記号
-					                ( c=='\u203e' )|| // ~記号
-					                ( c>='\uff61' && c<='\uff9f' ) // 半角カナ
-					            ){
-							 sum += PaintTool.getMozisize()/2;
-						 }else{
-							 sum += PaintTool.getMozisize();
-						 }
-					}
 					g3.setFont(f);
+					FontMetrics fm = g3.getFontMetrics();
+					Rectangle rectText = fm.getStringBounds(PaintTool.getMozi(), g3).getBounds();
 					if(MoziFrame.cb1.isSelected()){
 						if(MoziFrame.rb4.isSelected())g3.setColor(PaintTool.color[0]);
 						if(MoziFrame.rb5.isSelected())g3.setColor(PaintTool.color[1]);
 						if(MoziFrame.rb6.isSelected())g3.setColor(PaintTool.color[2]);
 						g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()/3));
-						g3.drawString(PaintTool.getMozi(), x1 - sum/2 + PaintTool.getMozisize()*1/25*dx[MoziFrame.cb2.getSelectedIndex()], y1
-								+ PaintTool.getMozisize()*2/5 + PaintTool.getMozisize()*1/25*dy[MoziFrame.cb2.getSelectedIndex()]);
+						g3.drawString(PaintTool.getMozi(), x1 - rectText.width/2 + PaintTool.getMozisize()*1/25*dx[MoziFrame.cb2.getSelectedIndex()], 
+								y1 - rectText.height/2+fm.getMaxAscent() + PaintTool.getMozisize()*1/25*dy[MoziFrame.cb2.getSelectedIndex()]);
 					}
 					g3.setColor(PaintTool.getColor());
 					g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-					g3.drawString(PaintTool.getMozi(), x1 - sum/2, y1
-							+ PaintTool.getMozisize()*2/5);
+					g3.drawString(PaintTool.getMozi(), x1 - rectText.width/2, y1 - rectText.height/2+fm.getMaxAscent());
 				} else {
 					if(regular == true){
 						g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -2565,84 +2673,22 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 							f = new Font(PaintTool.getfont(), Font.BOLD, PaintTool
 									.getMozisize());
 						}
-						int sum = 0;
-						for(int i = 0;i<PaintTool.getMozi().length();i++){
-							char c = PaintTool.getMozi().charAt(i);
-							 if( ( c<='\u007e' )|| // 英数字
-						                ( c=='\u00a5' )|| // \記号
-						                ( c=='\u203e' )|| // ~記号
-						                ( c>='\uff61' && c<='\uff9f' ) // 半角カナ
-						            ){
-								 sum += PaintTool.getMozisize()/2;
-							 }else{
-								 sum += PaintTool.getMozisize();
-							 }
-						}
 						g2.setFont(f);
+						FontMetrics fm = g2.getFontMetrics();
+						Rectangle rectText = fm.getStringBounds(PaintTool.getMozi(), g2).getBounds();
 						if(MoziFrame.cb1.isSelected()){
 							if(MoziFrame.rb4.isSelected())g2.setColor(PaintTool.color[0]);
 							if(MoziFrame.rb5.isSelected())g2.setColor(PaintTool.color[1]);
 							if(MoziFrame.rb6.isSelected())g2.setColor(PaintTool.color[2]);
 							g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()/3));
-							g2.drawString(PaintTool.getMozi(), x1 - sum/2 + PaintTool.getMozisize()*1/25*dx[MoziFrame.cb2.getSelectedIndex()], y1
-									+ PaintTool.getMozisize()*2/5 + PaintTool.getMozisize()*1/25*dy[MoziFrame.cb2.getSelectedIndex()]);
+							g2.drawString(PaintTool.getMozi(), x1 - rectText.width/2 + PaintTool.getMozisize()*1/25*dx[MoziFrame.cb2.getSelectedIndex()], y1
+								- rectText.height/2+fm.getMaxAscent() + PaintTool.getMozisize()*1/25*dy[MoziFrame.cb2.getSelectedIndex()]);
 						}
 						g2.setColor(PaintTool.getColor());
 						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-						g2.drawString(PaintTool.getMozi(), x1 - sum/2, y1
-								+ PaintTool.getMozisize()*2/5);
+						g2.drawString(PaintTool.getMozi(), x1 - rectText.width/2, y1
+							- rectText.height/2+fm.getMaxAscent());
 					}
-				}
-			} else if (PaintTool.type == 10) { // 点線
-				if(press && (regular || clock)){
-					debug =true;
-					g3.drawImage(img[imgnum], 0, 0, this);
-					if(set){
-						if((SelectOptionFrame.rb3.isSelected())){
-							g3.clip(maskare);
-						} else if((SelectOptionFrame.rb4.isSelected())){
-							g3.clip(maskare2);
-						}
-					}
-					if(imgtemp == null){//書き始め
-						imgtemp = new BufferedImage(img[imgnum].getWidth(), img[imgnum].getHeight(), BufferedImage.TYPE_INT_RGB);
-						Graphics2D g4 = imgtemp.createGraphics();
-						g4.drawImage(img[imgnum], 0, 0, this);//一時imgin保存
-					}
-					if(!clock){
-						Graphics2D g4 = imgtemp.createGraphics();
-						g4.setColor(PaintTool.getColor());
-						g4.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-						if (oldx > -1000) {
-							g4.setStroke(new BasicStroke(PaintTool.getsize(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
-							int tmp  = Math.round(PaintTool.getsize() * 10 * PaintTool.getsize2f() * (off ? 100 - PaintTool.getsize3():PaintTool.getsize3())/50) - (distancecount + (x1-oldx)*(x1-oldx) + (y1-oldy)*(y1-oldy));
-							while(tmp < 0){
-								tmp = Math.round(PaintTool.getsize() * 10 * PaintTool.getsize2f() * (off ? 100 - PaintTool.getsize3():PaintTool.getsize3())/50) - distancecount;
-								x2 = oldx + (int)Math.round((x1-oldx)*(Math.sqrt(tmp)/Math.sqrt((x1-oldx)*(x1-oldx)+(y1-oldy)*(y1-oldy))));
-								y2 = oldy + (int)Math.round((y1-oldy)*(Math.sqrt(tmp)/Math.sqrt((x1-oldx)*(x1-oldx)+(y1-oldy)*(y1-oldy))));
-								if(!off)g4.drawLine(oldx, oldy, x2, y2);
-								oldx = x2;
-								oldy = y2;
-								off = !off;
-								distancecount = 0;
-								tmp  = Math.round(PaintTool.getsize() * 10 * PaintTool.getsize2f() * (off ? 100 - PaintTool.getsize3():PaintTool.getsize3())/50) - (distancecount + (x1-oldx)*(x1-oldx) + (y1-oldy)*(y1-oldy));
-							}
-							if(!off)g4.drawLine(oldx, oldy, x1, y1);
-							g4.setStroke(new BasicStroke(1,BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
-							distancecount += (x1-oldx)*(x1-oldx) + (y1-oldy)*(y1-oldy);
-							oldx = x1;
-							oldy = y1;
-						}
-					}
-					g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-					g3.drawImage(imgtemp, 0, 0, this);
-				} else if(!press && regular && imgtemp != null){//線確定
-					g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-					g2.drawImage(imgtemp, 0, 0, this);
-					oldx = -1000;
-					oldy = -1000;
-					off = false;
-					imgtemp = null;
 				}
 			} else if (PaintTool.type == 12) {// 選択ツール
 				g2.setClip(null);
@@ -4702,7 +4748,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 							curvetrans[pcnt] = PaintTool.getsize5();
 							curvecolor[pcnt] = PaintTool.getColor();
 							curvesize[pcnt] = PaintTool.getsize4();
-							curveside[pcnt] = ToolPanel.rb8.isSelected();
+							curveside[pcnt] = PaintTool.p15.getborder();
+							curvepattern[pcnt] = PaintTool.p15.getpattern();
 							x3[pcnt] = x1;
 							y3[pcnt] = y1;
 							x4[pcnt] = x2;
@@ -4715,10 +4762,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 							if(curvex == -1000){
 								for(int i = 0 ; i < pcnt; i++){
 									g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-									if(curveside[i]){
-										g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+									if(curvepattern[i][0] == 0){
+										g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 									}else{
-										g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
+										g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
 									}
 									g3.setColor(curvecolor[i]);
 									g3.drawLine(x3[i], y3[i], x4[i], y4[i]);
@@ -4726,10 +4773,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 							}else if(curvex2 == -1000){
 								for(int i = 0 ; i < pcnt; i++){
 									g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-									if(curveside[i]){
-										g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+									if(curvepattern[i][0] == 0){
+										g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 									}else{
-										g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
+										g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
 									}
 									g3.setColor(curvecolor[i]);
 									g3.draw(new QuadCurve2D.Float(x3[i], y3[i], curvex, curvey, x4[i], y4[i]));
@@ -4741,12 +4788,11 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 							}else{
 								for(int i = 0 ; i < pcnt; i++){
 									g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-									if(curveside[i]){
-										g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+									if(curvepattern[i][0] == 0){
+										g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 									}else{
-										g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
-									}
-									g3.setColor(curvecolor[i]);
+										g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
+									}g3.setColor(curvecolor[i]);
 									g3.draw(new CubicCurve2D.Float(x3[i], y3[i], curvex, curvey, curvex2, curvey2, x4[i], y4[i]));
 								}
 								g3.setStroke(new BasicStroke(1));
@@ -4757,19 +4803,15 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 							}
 						}else{ //線引きデバッグ
 							g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-							if(ToolPanel.rb8.isSelected()){
-								g3.setStroke(new BasicStroke(PaintTool.getsize4(),BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
-							}else{
-								g3.setStroke(new BasicStroke(PaintTool.getsize4(),BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
-							}
+							setStroke(g3);
 							if(curvex == -1000){
 								if(move == 1)g3.drawLine(x1, y1, x2, y2);
 								for(int i = 0 ; i < pcnt; i++){
 									g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-									if(curveside[i]){
-										g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+									if(curvepattern[i][0] == 0){
+										g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 									}else{
-										g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
+										g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
 									}
 									g3.setColor(curvecolor[i]);
 									g3.drawLine(x3[i], y3[i], x4[i], y4[i]);
@@ -4778,10 +4820,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 								if(move == 1)g3.draw(new QuadCurve2D.Float(x1, y1, curvex, curvey, x2, y2));
 								for(int i = 0 ; i < pcnt; i++){
 									g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-									if(curveside[i]){
-										g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+									if(curvepattern[i][0] == 0){
+										g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 									}else{
-										g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
+										g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
 									}
 									g3.setColor(curvecolor[i]);
 									g3.draw(new QuadCurve2D.Float(x3[i], y3[i], curvex, curvey, x4[i], y4[i]));
@@ -4794,10 +4836,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 								if(move == 1)g3.draw(new CubicCurve2D.Float(x1, y1, curvex, curvey, curvex2, curvey2, x2, y2));
 								for(int i = 0 ; i < pcnt; i++){
 									g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-									if(curveside[i]){
-										g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+									if(curvepattern[i][0] == 0){
+										g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 									}else{
-										g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
+										g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
 									}
 									g3.setColor(curvecolor[i]);
 									g3.draw(new CubicCurve2D.Float(x3[i], y3[i], curvex, curvey, curvex2, curvey2, x4[i], y4[i]));
@@ -4820,10 +4862,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 						if(curvex == -1000){
 							for(int i = 0 ; i < pcnt; i++){
 								g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-								if(curveside[i]){
-									g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+								if(curvepattern[i][0] == 0){
+									g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 								}else{
-									g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
+									g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
 								}
 								g3.setColor(curvecolor[i]);
 								g3.drawLine(x3[i], y3[i], x4[i], y4[i]);
@@ -4831,10 +4873,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 						}else if(curvex2 == -1000){
 							for(int i = 0 ; i < pcnt; i++){
 								g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-								if(curveside[i]){
-									g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+								if(curvepattern[i][0] == 0){
+									g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 								}else{
-									g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
+									g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
 								}
 								g3.setColor(curvecolor[i]);
 								g3.draw(new QuadCurve2D.Float(x3[i], y3[i], curvex, curvey, x4[i], y4[i]));
@@ -4846,10 +4888,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 						}else{
 							for(int i = 0 ; i < pcnt; i++){
 								g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-								if(curveside[i]){
-									g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+								if(curvepattern[i][0] == 0){
+									g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 								}else{
-									g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
+									g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
 								}
 								g3.setColor(curvecolor[i]);
 								g3.draw(new CubicCurve2D.Float(x3[i], y3[i], curvex, curvey, curvex2, curvey2, x4[i], y4[i]));
@@ -4866,10 +4908,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					if(curvex == -1000){
 						for(int i = 0 ; i < pcnt; i++){
 							g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-							if(curveside[i]){
-								g2.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+							if(curvepattern[i][0] == 0){
+								g2.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 							}else{
-								g2.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
+								g2.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
 							}
 							g2.setColor(curvecolor[i]);
 							g2.drawLine(x3[i], y3[i], x4[i], y4[i]);
@@ -4877,23 +4919,21 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					}else if(curvex2 == -1000){
 						for(int i = 0 ; i < pcnt; i++){
 							g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-							if(curveside[i]){
-								g2.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+							if(curvepattern[i][0] == 0){
+								g2.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 							}else{
-								g2.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
-							}
-							g2.setColor(curvecolor[i]);
+								g2.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
+							}g2.setColor(curvecolor[i]);
 							g2.draw(new QuadCurve2D.Float(x3[i], y3[i], curvex, curvey, x4[i], y4[i]));
 						}
 					}else{
 						for(int i = 0 ; i < pcnt; i++){
 							g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-							if(curveside[i]){
-								g2.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+							if(curvepattern[i][0] == 0){
+								g2.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 							}else{
-								g2.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
-							}
-							g2.setColor(curvecolor[i]);
+								g2.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
+							}g2.setColor(curvecolor[i]);
 							g2.draw(new CubicCurve2D.Float(x3[i], y3[i], curvex, curvey, curvex2, curvey2, x4[i], y4[i]));
 						}
 					}
@@ -4909,10 +4949,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					if(curvex == -1000){
 						for(int i = 0 ; i < pcnt; i++){
 							g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-							if(curveside[i]){
-								g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+							if(curvepattern[i][0] == 0){
+								g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 							}else{
-								g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
+								g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
 							}
 							g3.setColor(curvecolor[i]);
 							g3.drawLine(x3[i], y3[i], x4[i], y4[i]);
@@ -4921,10 +4961,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					}else if(curvex2 == -1000){
 						for(int i = 0 ; i < pcnt; i++){
 							g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-							if(curveside[i]){
-								g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+							if(curvepattern[i][0] == 0){
+								g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 							}else{
-								g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
+								g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
 							}
 							g3.setColor(curvecolor[i]);
 							g3.draw(new QuadCurve2D.Float(x3[i], y3[i], curvex, curvey, x4[i], y4[i]));
@@ -4937,10 +4977,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					}else{
 						for(int i = 0 ; i < pcnt; i++){
 							g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, curvetrans[i]));
-							if(curveside[i]){
-								g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_ROUND,BasicStroke.JOIN_MITER));
+							if(curvepattern[i][0] == 0){
+								g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER));
 							}else{
-								g3.setStroke(new BasicStroke(curvesize[i],BasicStroke.CAP_SQUARE,BasicStroke.JOIN_MITER));
+								g3.setStroke(new BasicStroke(curvesize[i], curveside[i], BasicStroke.JOIN_MITER, 1.0f, curvepattern[i], 0.0f));
 							}
 							g3.setColor(curvecolor[i]);
 							g3.draw(new CubicCurve2D.Float(x3[i], y3[i], curvex, curvey, curvex2, curvey2, x4[i], y4[i]));
@@ -5191,11 +5231,12 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				listname = "文字";
 				regular = true;
 				repaint();
-			} else if (PaintTool.type == 5 || PaintTool.type == 8
-					|| PaintTool.type == 10 || PaintTool.type == 13 || PaintTool.type == 14 || PaintTool.type == 15 || PaintTool.type == 25) {
+			} else if (PaintTool.type == 5 || PaintTool.type == 8 || PaintTool.type == 13 || PaintTool.type == 14 || PaintTool.type == 15 || PaintTool.type == 25) {
 				capt = true;
 				if (PaintTool.type == 5){
 					listname = "線";
+					oldx = x1;
+					oldy = y1;
 				}else if (PaintTool.type == 8){
 					listname = "スプレー";
 					timer3 = new Timer();
@@ -5204,10 +5245,6 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 						System.out.println("AA");
 						repaint();
 					}}, 1, 50);
-				}else if (PaintTool.type == 10){
-					listname = "点線";
-					oldx = x1;
-					oldy = y1;
 				}else if (PaintTool.type == 13){
 					listname = "オリジナルライン";
 				}else if (PaintTool.type == 14){
@@ -5476,10 +5513,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				debug = true;
 				regular = true;
 				repaint();
-			} else if (PaintTool.type == 5 || PaintTool.type == 10|| PaintTool.type == 13 || PaintTool.type == 14 || PaintTool.type == 15 || PaintTool.type == 25) {
+			} else if (PaintTool.type == 5 || PaintTool.type == 13 || PaintTool.type == 14 || PaintTool.type == 15 || PaintTool.type == 25) {
 				x1 = (int)(((double)e.getX())/PaintTool.scale);
 				y1 = (int)(((double)e.getY())/PaintTool.scale);
-				if(PaintTool.type == 10)distancecount = 0;
+				if(PaintTool.type == 5)distancecount = 0;
 				regular = true;
 				repaint();
 			} else if (PaintTool.type == 8){
@@ -5692,7 +5729,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				x3[pcnt] = (int)(((double)e.getX())/PaintTool.scale);
 				y3[pcnt] = (int)(((double)e.getY())/PaintTool.scale);
 				repaint();
-			}else if (PaintTool.type == 5 || PaintTool.type == 10 || PaintTool.type == 13 || PaintTool.type == 14 || PaintTool.type == 15 || PaintTool.type == 25) {
+			}else if (PaintTool.type == 5 || PaintTool.type == 13 || PaintTool.type == 14 || PaintTool.type == 15 || PaintTool.type == 25) {
 				x1 = (int)(((double)e.getX())/PaintTool.scale);
 				y1 = (int)(((double)e.getY())/PaintTool.scale);
 				regular = true;

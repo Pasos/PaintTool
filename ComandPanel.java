@@ -18,8 +18,8 @@ public class ComandPanel extends JPanel implements ActionListener {
 	public JTextField t1;
 	private JLabel l1, l2, l3;
 	public JLabel l4, l5, l6, l7, l8, l9, l10, l11;
-	public static JButton b2, b3, b4, b5, b6, b7, b8, b9, b10, b11,b12,b13,b14,b15;
-	ImageIcon i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13,i14,i15;
+	public static JButton b2, b3, b4, b5, b6, b7, b8, b9, b10, b11,b12,b13,b14,b15,b16;
+	ImageIcon i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13,i14,i15,i16;
 	public static float tmpx = 0, tmpy = 0;
 	JPanel p;
     
@@ -72,7 +72,7 @@ public class ComandPanel extends JPanel implements ActionListener {
 		b9.setMargin(new Insets(0,0,0,0));
 		i10 = new ImageIcon(getClass().getResource("選択ツール.png"));
 		b10 = new JButton(i10);
-		b10.setToolTipText("選択ツールオプションウィンドウ");
+		b10.setToolTipText("選択ツールオプション設定");
 		b10.setMargin(new Insets(0,0,0,0));
 		b10.setBackground(Color.white);
 		i11 = new ImageIcon(getClass().getResource("履歴.png"));
@@ -97,9 +97,14 @@ public class ComandPanel extends JPanel implements ActionListener {
 		b14.setBackground(Color.white);
 		i15 = new ImageIcon(getClass().getResource("ルーラー.png"));
 		b15 = new JButton(i15);
-		b15.setToolTipText("ルーラーウィンドウ");
+		b15.setToolTipText("ルーラー設定");
 		b15.setMargin(new Insets(0,0,0,0));
 		b15.setBackground(Color.white);
+		i16 = new ImageIcon(getClass().getResource("ストローク.png"));
+		b16 = new JButton(i16);
+		b16.setToolTipText("ストローク設定");
+		b16.setMargin(new Insets(0,0,0,0));
+		b16.setBackground(Color.white);
 		l1 = new JLabel("ｽｹｰﾙ");
 		t1 = new JTextField("1", 5);
 		l2 = new JLabel("倍");
@@ -140,6 +145,7 @@ public class ComandPanel extends JPanel implements ActionListener {
 		add(b11);
 		add(b10);
 		add(b14);
+		add(b16);
 		add(l4);
 		add(l5);
 		add(l6);
@@ -164,6 +170,7 @@ public class ComandPanel extends JPanel implements ActionListener {
 		b13.addActionListener(this);
 		b14.addActionListener(this);
 		b15.addActionListener(this);
+		b16.addActionListener(this);
 		t1.addActionListener(this);
 	}
 
@@ -250,6 +257,14 @@ public class ComandPanel extends JPanel implements ActionListener {
 			}else{
 				PaintTool.rulerVisible();
 				PaintTool.rulerm.setSelected(true);
+			}
+		}else if (e.getSource() == b16) { // ストローク
+			if(PaintTool.p15.isVisible()){
+				PaintTool.strokeInvisible();
+				PaintTool.strokem.setSelected(false);
+			}else{
+				PaintTool.strokeVisible();
+				PaintTool.strokem.setSelected(true);
 			}
 		}
 	}

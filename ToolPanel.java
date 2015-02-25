@@ -167,7 +167,6 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 		cb.addItem("直線");
 		cb.addItem("線");
 		cb.addItem("曲線");
-		cb.addItem("点線");
 		cb.addItem("オリジナル線");
 		cb.addItem("長方形");
 		cb.addItem("長方形(中塗)");
@@ -304,10 +303,6 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 		add(t5);
 		add(l2);
 		add(t1);
-		add(l3);
-		add(l8);
-		add(rb8);
-		add(rb9);
 		cb.addActionListener(this);
 		cbh.addActionListener(this);
 		t2.addActionListener(this);
@@ -486,9 +481,6 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 				spraysize2 = Integer.parseInt(t2.getText());
 				spraysize3 = Integer.parseInt(t3.getText());
 				spraysize4 = Integer.parseInt(t4.getText());
-				break;
-			case 10:
-				size = Integer.parseInt(t1.getText());
 				break;
 			case 13:
 				size = Integer.parseInt(t1.getText());
@@ -729,12 +721,6 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 					add(t1);
 					l2.setText("サイズ");
 					t1.setText(Integer.toString(size));
-					add(l8);
-					l8.setText("縁");
-					add(rb8);
-					add(rb9);
-					rb8.setText("丸");
-					rb9.setText("四角");
 				} else if (cb.getSelectedItem() == "長方形") { // 長方形
 					PaintTool.setType(1);
 					add(l6);
@@ -1004,34 +990,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 					add(t5);
 					l6.setText("透明度");
 					PaintTool.moziVisible();
-				} else if (cb.getSelectedItem() == "点線") { // 点線
-					PaintTool.setType(10);
-					add(l6);
-					add(s);
-					DrawPanel.distancecount = 0;
-					s.revalidate();
-					try{
-						s.setValue(Math.round(Float.parseFloat(t5.getText())*10000));
-					}catch (NumberFormatException t) {
-						s.setValue(10000);
-					}
-					add(t5);
-					l6.setText("透明度");
-					add(l2);
-					add(t1);
-					l2.setText("サイズ");
-					t1.setText(Integer.toString(size));
-					add(l3);
-					add(t2);
-					l3.setText("細かさ");
-					t2.setText("3");
-					add(l5);
-					add(t3);
-					add(l4);
-					l5.setText("実線割合");
-					t3.setText("50");
-					l4.setText("%");
-				} else if (cb.getSelectedItem() == "色取込") { // GrabColor
+				}else if (cb.getSelectedItem() == "色取込") { // GrabColor
 					PaintTool.setType(11);
 				} else if (cb.getSelectedItem() == "選択ツール") { // SelectTool
 					PaintTool.setType(12);
@@ -1330,12 +1289,6 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 					l9.setText("サイズ");
 					add(t4);
 					t4.setText(Integer.toString(size));
-					add(l8);
-					l8.setText("縁");
-					add(rb8);
-					add(rb9);
-					rb8.setText("丸");
-					rb9.setText("四角");
 					add(l3);
 					l3.setText("|");
 					add(rb1);

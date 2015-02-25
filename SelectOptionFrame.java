@@ -16,7 +16,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class SelectOptionFrame extends JFrame  implements ActionListener, ChangeListener{
+public class SelectOptionFrame extends JFrame implements ActionListener, ChangeListener{
 	private static final long serialVersionUID = 2L;
 
 	static public JRadioButton rb1, rb2, rb3, rb4, rb5, rb6, rb7, rb8, rb9, rb10, rb11;

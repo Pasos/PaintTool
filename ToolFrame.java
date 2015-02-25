@@ -11,8 +11,8 @@ import javax.swing.JFrame;
 
 public class ToolFrame  extends JFrame  implements ActionListener{
 
-	ImageIcon i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17,i18,i19,i21,i22,i23,i24,i25,i26;
-	JButton b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,b11,b12,b13,b14,b15,b16,b17,b18,b19,b21,b22,b23,b24,b25,b26;
+	ImageIcon i1,i2,i3,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17,i18,i19,i21,i22,i23,i24,i25,i26;
+	JButton b1,b2,b3,b5,b6,b7,b8,b9,b10,b11,b12,b13,b14,b15,b16,b17,b18,b19,b21,b22,b23,b24,b25,b26;
 	
 	void visible(){
 		setVisible(true);
@@ -32,7 +32,6 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 		i1 = new ImageIcon(getClass().getResource("直線.png"));
 		i2 = new ImageIcon(getClass().getResource("線.png"));
 		i3 = new ImageIcon(getClass().getResource("曲線.png"));
-		i4 = new ImageIcon(getClass().getResource("点線.png"));
 		i5 = new ImageIcon(getClass().getResource("オリジナル線.png"));
 		i6 = new ImageIcon(getClass().getResource("水平線.png"));
 		i7 = new ImageIcon(getClass().getResource("長方形.png"));
@@ -60,8 +59,6 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 		b2.setToolTipText("線");
 		b3 = new JButton(i3);
 		b3.setToolTipText("曲線");
-		b4 = new JButton(i4);
-		b4.setToolTipText("点線");
 		b5 = new JButton(i5);
 		b5.setToolTipText("オリジナル線");
 		b6 = new JButton(i6);
@@ -107,7 +104,6 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 		b1.setMargin(new Insets(0,0,0,0));
 		b2.setMargin(new Insets(0,0,0,0));
 		b3.setMargin(new Insets(0,0,0,0));
-		b4.setMargin(new Insets(0,0,0,0));
 		b5.setMargin(new Insets(0,0,0,0));
 		b6.setMargin(new Insets(0,0,0,0));
 		b7.setMargin(new Insets(0,0,0,0));
@@ -132,7 +128,6 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 		add(b1);
 		add(b2);
 		add(b3);
-		add(b4);
 		add(b5);
 		add(b6);
 		add(b7);
@@ -159,7 +154,6 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 		b1.addActionListener(this);
 		b2.addActionListener(this);
 		b3.addActionListener(this);
-		b4.addActionListener(this);
 		b5.addActionListener(this);
 		b6.addActionListener(this);
 		b7.addActionListener(this);
@@ -210,9 +204,6 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 			ToolPanel.spraysize2 = Integer.parseInt(PaintTool.p1.t2.getText());
 			ToolPanel.spraysize3 = Integer.parseInt(PaintTool.p1.t3.getText());
 			ToolPanel.spraysize4 = Integer.parseInt(PaintTool.p1.t4.getText());
-			break;
-		case 10:
-			ToolPanel.size = Integer.parseInt(PaintTool.p1.t1.getText());
 			break;
 		case 13:
 			ToolPanel.size = Integer.parseInt(PaintTool.p1.t1.getText());
@@ -622,34 +613,6 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 			PaintTool.p1.add(PaintTool.p1.t5);
 			ToolPanel.l6.setText("透明度");
 			PaintTool.moziVisible();
-		} else if (e.getSource() == b4) { // 点線
-			PaintTool.p1.cb.setSelectedItem("点線");
-			PaintTool.setType(10);
-			PaintTool.p1.add(ToolPanel.l6);
-			PaintTool.p1.add(ToolPanel.s);
-			DrawPanel.distancecount = 0;
-			ToolPanel.s.revalidate();
-			try{
-				ToolPanel.s.setValue(Math.round(Float.parseFloat(PaintTool.p1.t5.getText())*10000));
-			}catch (NumberFormatException t) {
-				ToolPanel.s.setValue(10000);
-			}
-			PaintTool.p1.add(PaintTool.p1.t5);
-			ToolPanel.l6.setText("透明度");
-			PaintTool.p1.add(ToolPanel.l2);
-			PaintTool.p1.add(PaintTool.p1.t1);
-			ToolPanel.l2.setText("サイズ");
-			PaintTool.p1.t1.setText(Integer.toString(ToolPanel.size));
-			PaintTool.p1.add(ToolPanel.l3);
-			PaintTool.p1.add(PaintTool.p1.t2);
-			ToolPanel.l3.setText("細かさ");
-			PaintTool.p1.t2.setText("3");
-			PaintTool.p1.add(ToolPanel.l5);
-			PaintTool.p1.add(PaintTool.p1.t3);
-			PaintTool.p1.add(ToolPanel.l4);
-			ToolPanel.l5.setText("実線割合");
-			PaintTool.p1.t3.setText("50");
-			ToolPanel.l4.setText("%");
 		} else if (e.getSource() == b22) { // 色取り込み
 			PaintTool.p1.cb.setSelectedItem("色取込");
 			PaintTool.setType(11);

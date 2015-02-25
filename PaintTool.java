@@ -81,12 +81,13 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 	static ToolFrame p12;
 	static ColorFrame p13;
 	static RulerFrame p14;
+	static StrokeFrame p15;
 	static public JScrollPane scrollpane;
 	static public JPopupMenu popup;
 	static  public JMenuItem copyMenuItem, pasteMenuItem;
 	static JMenuItem savem, undom, redom, copym, pastem;
 	static JRadioButtonMenuItem bmpm, jpgm, pngm, gifm;
-	static  public JCheckBoxMenuItem historym, selectm, viewm, toolm, hsvm, rulerm;
+	static  public JCheckBoxMenuItem historym, selectm, viewm, toolm, hsvm, rulerm, strokem;
 	static JMenuBar menubar;
 
 	/* ★★入出力系★★ */
@@ -376,6 +377,14 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 	static void rulerInvisible() {
 		p14.invisible();
 	}
+	
+	static void strokeVisible() {
+		p15.visible();
+	}
+
+	static void strokeInvisible() {
+		p15.invisible();
+	}
 
 	static void historyVisible() {
 		p10.visible();
@@ -497,6 +506,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		p12 = new ToolFrame();
 		p13 = new ColorFrame();
 		p14 = new RulerFrame();
+		p15 = new StrokeFrame();
 		p4.setAlwaysOnTop(true);
 		p7.setAlwaysOnTop(true);
 		p8.setAlwaysOnTop(true);
@@ -647,6 +657,8 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		selectm = new JCheckBoxMenuItem("選択ツール", false);
 		toolm = new JCheckBoxMenuItem("ツール", false);
 		hsvm = new JCheckBoxMenuItem("HSV色選択", false);
+		strokem = new JCheckBoxMenuItem("ストローク", false);
+		
 		
 		JMenuItem verm = new JMenuItem("バージョン情報");
 
@@ -678,6 +690,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		Menu4.add(selectm);
 		Menu4.add(toolm);
 		Menu4.add(hsvm);
+		Menu4.add(strokem);
 
 		Menu5.add(verm);
 
