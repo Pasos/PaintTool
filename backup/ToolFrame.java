@@ -815,6 +815,7 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 			ToolPanel.rb3.setText("");
 			ToolPanel.rb4.setText("");
 			ToolPanel.rb5.setText("");
+			ToolPanel.rb3.setSelected(true);
 			PaintTool.p1.add(ToolPanel.rb8);
 			PaintTool.p1.add(ToolPanel.rb9);
 			PaintTool.p1.add(ToolPanel.rb11);
@@ -822,7 +823,12 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 			ToolPanel.rb9.setText("REFLECT");
 			ToolPanel.rb11.setText("REPEAT");
 			ToolPanel.rb8.setSelected(true);
-			ToolPanel.rb3.setSelected(true);
+			PaintTool.p1.add(ToolPanel.rb1);
+			PaintTool.p1.add(ToolPanel.rb2);
+			ToolPanel.rb1.setText("描く");
+			ToolPanel.rb2.setText("始点設定");
+			ToolPanel.rb1.setSelected(true);
+			ToolPanel.rb2.setEnabled(false);
 		}else if (e.getSource() == b6) { // 水平線
 			PaintTool.p1.cb.setSelectedItem("水平線");
 			PaintTool.setType(18);

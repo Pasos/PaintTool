@@ -9,6 +9,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint;
+import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Polygon;
 import java.awt.RadialGradientPaint;
 import java.awt.Rectangle;
@@ -50,7 +51,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 	private static final long serialVersionUID = 2L;
 	
 	public int oldx, oldy, tentenphase;
-	public static int x1, x2, y1, y2, curvex, curvey, curvex2, curvey2, arcx1, arcy1, arcx2, arcy2, imgnum = 0, startimg = 0, endimg = 0, start2img = 0, end2img = 0,pcnt = 0, pcnt2 = 0, move = 0, setx1, setx2, sety1, sety2, ssetx1, ssety1, rotatex2, rotatey2, originalrotate = 0, copyx, copyy, distancecount;
+	public static int x1, x2, y1, y2, curvex, curvey, curvex2, curvey2, arcx1, arcy1, arcx2, arcy2, imgnum = 0, startimg = 0, endimg = 0, start2img = 0, end2img = 0,pcnt = 0, pcnt2 = 0, move = 0, setx1, setx2, sety1, sety2, ssetx1, ssety1, rotatex2, rotatey2, originalrotate = 0, copyx, copyy, distancecount, centerx, centery;
 	public int[] x3, y3, x4 ,y4, curvesize, curveside;
 	public float[] curvetrans;
 	public float[][] curvepattern;
@@ -441,6 +442,16 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				end2img = ++end2img % PaintTool.HistoryNUM;
 			} catch (Exception d) {
 			}
+		}
+	}
+	
+	CycleMethod getGradientPattern(){
+		if(ToolPanel.rb8.isSelected()){
+			return MultipleGradientPaint.CycleMethod.NO_CYCLE;
+		}else if(ToolPanel.rb9.isSelected()){
+			return MultipleGradientPaint.CycleMethod.REFLECT;
+		}else{
+			return MultipleGradientPaint.CycleMethod.REPEAT;
 		}
 	}
 	
@@ -1322,6 +1333,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		curveside = new int[100];
 		curvecolor = new Color[100];
 		curvepattern = new float[100][4];
+		centerx = -1;
+		centery = -1;
 		img = new BufferedImage[PaintTool.HistoryNUM];
 		shaps = new Shape[PaintTool.HistoryNUM];
 		setchange = new boolean[PaintTool.HistoryNUM];
@@ -3807,89 +3820,69 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					g3.drawImage(img[imgnum], 0, 0, this);
 					g3.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 					g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-					if(ToolPanel.rb3.isSelected()){
-						float[] dist = {0.0f, 1.0f};
-						Color[] colors = {PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
-						LinearGradientPaint gradient;
-						if(ToolPanel.rb8.isSelected()){
-							gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, MultipleGradientPaint.CycleMethod.NO_CYCLE);
-						}else if(ToolPanel.rb9.isSelected()){
-							gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, MultipleGradientPaint.CycleMethod.REFLECT);
-						}else{
-							gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, MultipleGradientPaint.CycleMethod.REPEAT);
+					if(ToolPanel.rb1.isSelected()){//描く
+						if(ToolPanel.rb3.isSelected()){
+							float[] dist = {0.0f, 1.0f};
+							Color[] colors = {PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
+							LinearGradientPaint gradient;
+							gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, getGradientPattern());
+							g3.setPaint(gradient);
+							g3.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
+						}else if(ToolPanel.rb4.isSelected()){
+							float[] dist = {0.0f, 0.5f, 1.0f};
+							Color[] colors = {PaintTool.color[(PaintTool.colornum+1)%24], PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
+							LinearGradientPaint gradient;
+							gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, getGradientPattern());
+							g3.setPaint(gradient);
+							g3.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
+						}else{//円グラデーション
+							float[] dist = {0.0f, 1.0f};
+							Color[] colors = {PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
+							RadialGradientPaint gradient;
+							if(centerx == -1 && centery == -1){
+								gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), dist, colors, getGradientPattern());
+							}else{
+								gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), centerx, centery, dist, colors, getGradientPattern());
+							}
+							g3.setPaint(gradient);
+							g3.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
 						}
-						g3.setPaint(gradient);
-						g3.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
-					}else if(ToolPanel.rb4.isSelected()){
-						float[] dist = {0.0f, 0.5f, 1.0f};
-						Color[] colors = {PaintTool.color[(PaintTool.colornum+1)%24], PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
-						LinearGradientPaint gradient;
-						if(ToolPanel.rb8.isSelected()){
-							gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, MultipleGradientPaint.CycleMethod.NO_CYCLE);
-						}else if(ToolPanel.rb9.isSelected()){
-							gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, MultipleGradientPaint.CycleMethod.REFLECT);
-						}else{
-							gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, MultipleGradientPaint.CycleMethod.REPEAT);
-						}
-						g3.setPaint(gradient);
-						g3.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
-					}else{
-						float[] dist = {0.0f, 1.0f};
-						Color[] colors = {PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
-						RadialGradientPaint gradient;
-						if(ToolPanel.rb8.isSelected()){
-							gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), dist, colors, MultipleGradientPaint.CycleMethod.NO_CYCLE);
-						}else if(ToolPanel.rb9.isSelected()){
-							gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), dist, colors, MultipleGradientPaint.CycleMethod.REFLECT);
-						}else{
-							gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), dist, colors, MultipleGradientPaint.CycleMethod.REPEAT);
-						}
-						g3.setPaint(gradient);
-						g3.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
+					}else{//始点設定
+						g3.drawOval(centerx-1, centery-1, 2, 2);
 					}
 				} else {
 					if(regular){
 						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
 						g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-						if(ToolPanel.rb3.isSelected()){
-							float[] dist = {0.0f, 1.0f};
-							Color[] colors = {PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
-							LinearGradientPaint gradient;
-							if(ToolPanel.rb8.isSelected()){
-								gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, MultipleGradientPaint.CycleMethod.NO_CYCLE);
-							}else if(ToolPanel.rb9.isSelected()){
-								gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, MultipleGradientPaint.CycleMethod.REFLECT);
+						if(ToolPanel.rb1.isSelected()){//描く
+							if(ToolPanel.rb3.isSelected()){
+								float[] dist = {0.0f, 1.0f};
+								Color[] colors = {PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
+								LinearGradientPaint gradient;
+								gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, getGradientPattern());
+								g2.setPaint(gradient);
+								g2.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
+							}else if(ToolPanel.rb4.isSelected()){
+								float[] dist = {0.0f, 0.5f, 1.0f};
+								Color[] colors = {PaintTool.color[(PaintTool.colornum+1)%24], PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
+								LinearGradientPaint gradient;
+								gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, getGradientPattern());
+								g2.setPaint(gradient);
+								g2.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
 							}else{
-								gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, MultipleGradientPaint.CycleMethod.REPEAT);
-							}
+								float[] dist = {0.0f, 1.0f};
+								Color[] colors = {PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
+								RadialGradientPaint gradient;
+								if(centerx == -1 && centery == -1){
+									gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), dist, colors, getGradientPattern());
+								}else{
+									gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), centerx, centery, dist, colors, getGradientPattern());
+								}
 							g2.setPaint(gradient);
-							g2.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
-						}else if(ToolPanel.rb4.isSelected()){
-							float[] dist = {0.0f, 0.5f, 1.0f};
-							Color[] colors = {PaintTool.color[(PaintTool.colornum+1)%24], PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
-							LinearGradientPaint gradient;
-							if(ToolPanel.rb8.isSelected()){
-								gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, MultipleGradientPaint.CycleMethod.NO_CYCLE);
-							}else if(ToolPanel.rb9.isSelected()){
-								gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, MultipleGradientPaint.CycleMethod.REFLECT);
-							}else{
-								gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, MultipleGradientPaint.CycleMethod.REPEAT);
+								g2.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
 							}
-							g2.setPaint(gradient);
-							g2.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
-						}else{
-							float[] dist = {0.0f, 1.0f};
-							Color[] colors = {PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
-							RadialGradientPaint gradient;
-							if(ToolPanel.rb8.isSelected()){
-								gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), dist, colors, MultipleGradientPaint.CycleMethod.NO_CYCLE);
-							}else if(ToolPanel.rb9.isSelected()){
-								gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), dist, colors, MultipleGradientPaint.CycleMethod.REFLECT);
-							}else{
-								gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), dist, colors, MultipleGradientPaint.CycleMethod.REPEAT);
-							}
-							g2.setPaint(gradient);
-							g2.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
+						}else{//始点設定
+							g3.drawOval(centerx-1, centery-1, 2, 2);
 						}
 					}
 				}
@@ -5052,20 +5045,27 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					PaintTool.p5.l11.setText("");
 					repaint();
 			}else if(PaintTool.type == 17){
-				PaintTool.drawcation(true);
-				Timer timer = new Timer();
-				timer.schedule(new TimerTask() {public void run() {
-					capt = true;
-					listname = "グラデーション";
-					debug = false;
-					regular = true;
-					PaintTool.p5.l8.setText("");
-					PaintTool.p5.l9.setText("");
-					PaintTool.p5.l10.setText("");
-					PaintTool.p5.l11.setText("");
+				if(ToolPanel.rb1.isSelected()){
+					PaintTool.drawcation(true);
+					Timer timer = new Timer();
+					timer.schedule(new TimerTask() {public void run() {
+						capt = true;
+						listname = "グラデーション";
+						debug = false;
+						regular = true;
+						PaintTool.p5.l8.setText("");
+						PaintTool.p5.l9.setText("");
+						PaintTool.p5.l10.setText("");
+						PaintTool.p5.l11.setText("");
+						PaintTool.rewrite();
+					}}
+					, 1);
+				}else{
+					centerx = x2;
+					centery = y2;
+					debug = true;
 					PaintTool.rewrite();
-				}}
-				, 1);
+				}
 			}else if (PaintTool.type == 20) {
 				move = 0;
 				if(ToolPanel.rb2.isSelected()){
@@ -5301,9 +5301,22 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				y1 = (int)(((double)e.getY())/PaintTool.scale);
 				regular = true;
 				repaint();
-			}else if (PaintTool.type >= 0 && PaintTool.type <= 4 || PaintTool.type == 17|| PaintTool.type == 18) {
+			}else if (PaintTool.type >= 0 && PaintTool.type <= 4 || PaintTool.type == 18) {
 				x2 = (int)(((double)e.getX())/PaintTool.scale);
 				y2 = (int)(((double)e.getY())/PaintTool.scale);
+				debug = true;
+				PaintTool.p5.l9.setText(String.valueOf((int)(((double)e.getX())/PaintTool.scale) - x1));
+				PaintTool.p5.l11.setText(String.valueOf((int)(((double)e.getY())/PaintTool.scale) - y1));
+				repaint();
+			}else if (PaintTool.type == 17) {
+				if(ToolPanel.rb1.isSelected()){
+					x2 = (int)(((double)e.getX())/PaintTool.scale);
+					y2 = (int)(((double)e.getY())/PaintTool.scale);
+					
+				}else{
+					centerx = (int)(((double)e.getX())/PaintTool.scale);
+					centery = (int)(((double)e.getY())/PaintTool.scale);
+				}
 				debug = true;
 				PaintTool.p5.l9.setText(String.valueOf((int)(((double)e.getX())/PaintTool.scale) - x1));
 				PaintTool.p5.l11.setText(String.valueOf((int)(((double)e.getY())/PaintTool.scale) - y1));

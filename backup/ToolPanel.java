@@ -325,6 +325,9 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 		s3.addChangeListener(this);
 		rb1.addActionListener(this);
 		rb2.addActionListener(this);
+		rb3.addActionListener(this);
+		rb4.addActionListener(this);
+		rb5.addActionListener(this);
 		rb6.addActionListener(this);
 		rb7.addActionListener(this);
 		t5.addActionListener(this);
@@ -405,6 +408,24 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 					s3.setValue(200);
 					t2.setText(String.valueOf((float)-s3.getValue()/100.0));
 				}
+			}
+		}else if (e.getSource() == rb3) {//グラデ1
+			if(PaintTool.getType() == 17){
+				rb2.setEnabled(false);
+				rb1.setSelected(true);
+				DrawPanel.centerx = -1;
+				DrawPanel.centery = -1;
+			}
+		}else if (e.getSource() == rb4) {//グラデ2
+			if(PaintTool.getType() == 17){
+				rb2.setEnabled(false);
+				rb1.setSelected(true);
+				DrawPanel.centerx = -1;
+				DrawPanel.centery = -1;
+			}
+		}else if (e.getSource() == rb5) {//グラデ3
+			if(PaintTool.getType() == 17){
+				rb2.setEnabled(true);
 			}
 		}else if (e.getSource() == rb6) {//明るく
 			if(PaintTool.getType() == 15){
@@ -1197,6 +1218,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 					rb3.setText("");
 					rb4.setText("");
 					rb5.setText("");
+					rb3.setSelected(true);
 					add(rb8);
 					add(rb9);
 					add(rb11);
@@ -1204,7 +1226,14 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 					rb9.setText("REFLECT");
 					rb11.setText("REPEAT");
 					rb8.setSelected(true);
-					rb3.setSelected(true);
+					add(rb1);
+					add(rb2);
+					rb1.setText("描く");
+					rb2.setText("始点設定");
+					rb1.setSelected(true);
+					rb2.setEnabled(false);
+					DrawPanel.centerx = -1;
+					DrawPanel.centery = -1;
 				}else if (cb.getSelectedItem() == "水平線") { // HorizonLine
 					PaintTool.setType(18);
 					add(l6);
