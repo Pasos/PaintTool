@@ -278,6 +278,7 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 		PaintTool.p1.remove(ToolPanel.rb7);
 		PaintTool.p1.remove(ToolPanel.rb8);
 		PaintTool.p1.remove(ToolPanel.rb9);
+		PaintTool.p1.remove(ToolPanel.rb11);
 		PaintTool.p1.remove(ToolPanel.s);
 		PaintTool.p1.remove(ToolPanel.s2);
 		ToolPanel.l7.setEnabled(true);
@@ -328,12 +329,6 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 			PaintTool.p1.add(PaintTool.p1.t1);
 			ToolPanel.l2.setText("サイズ");
 			PaintTool.p1.t1.setText(Integer.toString(ToolPanel.size));
-			PaintTool.p1.add(ToolPanel.l8);
-			ToolPanel.l8.setText("縁");
-			PaintTool.p1.add(ToolPanel.rb8);
-			PaintTool.p1.add(ToolPanel.rb9);
-			ToolPanel.rb8.setText("丸");
-			ToolPanel.rb9.setText("四角");
 		} else if (e.getSource() == b7) { // 長方形
 			PaintTool.p1.cb.setSelectedItem("長方形");
 			PaintTool.setType(1);
@@ -810,18 +805,7 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 				ToolPanel.s.setValue(10000);
 			}
 			PaintTool.p1.add(PaintTool.p1.t5);
-			PaintTool.p1.add(ToolPanel.l5);
-			PaintTool.p1.add(ToolPanel.s2);
-			ToolPanel.s2.revalidate();
-			PaintTool.p1.t2.setText("1");
-			try{
-				ToolPanel.s2.setValue(Math.round(Float.parseFloat(PaintTool.p1.t2.getText())*10000));
-			}catch (NumberFormatException t) {
-				ToolPanel.s2.setValue(10000);
-			}
-			PaintTool.p1.add(PaintTool.p1.t2);
 			ToolPanel.l6.setText("透明度1");
-			ToolPanel.l5.setText("透明度2");
 			PaintTool.p1.add(ToolPanel.rb3);
 			PaintTool.p1.add(ToolPanel.il1);
 			PaintTool.p1.add(ToolPanel.rb4);
@@ -832,6 +816,19 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 			ToolPanel.rb4.setText("");
 			ToolPanel.rb5.setText("");
 			ToolPanel.rb3.setSelected(true);
+			PaintTool.p1.add(ToolPanel.rb8);
+			PaintTool.p1.add(ToolPanel.rb9);
+			PaintTool.p1.add(ToolPanel.rb11);
+			ToolPanel.rb8.setText("NORMAL");
+			ToolPanel.rb9.setText("REFLECT");
+			ToolPanel.rb11.setText("REPEAT");
+			ToolPanel.rb8.setSelected(true);
+			PaintTool.p1.add(ToolPanel.rb1);
+			PaintTool.p1.add(ToolPanel.rb2);
+			ToolPanel.rb1.setText("描く");
+			ToolPanel.rb2.setText("始点設定");
+			ToolPanel.rb1.setSelected(true);
+			ToolPanel.rb2.setEnabled(false);
 		}else if (e.getSource() == b6) { // 水平線
 			PaintTool.p1.cb.setSelectedItem("水平線");
 			PaintTool.setType(18);
@@ -921,13 +918,6 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 			PaintTool.p1.add(PaintTool.p1.t4);
 			PaintTool.p1.t4.setText(Integer.toString(ToolPanel.size));
 			PaintTool.p1.add(ToolPanel.l8);
-			ToolPanel.l8.setText("縁");
-			PaintTool.p1.add(ToolPanel.rb8);
-			PaintTool.p1.add(ToolPanel.rb9);
-			ToolPanel.rb8.setText("丸");
-			ToolPanel.rb9.setText("四角");
-			PaintTool.p1.add(ToolPanel.l3);
-			ToolPanel.l3.setText("|");
 			PaintTool.p1.add(ToolPanel.rb1);
 			PaintTool.p1.add(ToolPanel.rb2);
 			ToolPanel.rb1.setText("描く");

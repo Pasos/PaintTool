@@ -7,7 +7,11 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.LinearGradientPaint;
+import java.awt.MultipleGradientPaint;
+import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Polygon;
+import java.awt.RadialGradientPaint;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -47,7 +51,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 	private static final long serialVersionUID = 2L;
 	
 	public int oldx, oldy, tentenphase;
-	public static int x1, x2, y1, y2, curvex, curvey, curvex2, curvey2, arcx1, arcy1, arcx2, arcy2, imgnum = 0, startimg = 0, endimg = 0, start2img = 0, end2img = 0,pcnt = 0, pcnt2 = 0, move = 0, setx1, setx2, sety1, sety2, ssetx1, ssety1, rotatex2, rotatey2, originalrotate = 0, copyx, copyy, distancecount;
+	public static int x1, x2, y1, y2, curvex, curvey, curvex2, curvey2, arcx1, arcy1, arcx2, arcy2, imgnum = 0, startimg = 0, endimg = 0, start2img = 0, end2img = 0,pcnt = 0, pcnt2 = 0, move = 0, setx1, setx2, sety1, sety2, ssetx1, ssety1, rotatex2, rotatey2, originalrotate = 0, copyx, copyy, distancecount, centerx, centery;
 	public int[] x3, y3, x4 ,y4, curvesize, curveside;
 	public float[] curvetrans;
 	public float[][] curvepattern;
@@ -438,6 +442,16 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				end2img = ++end2img % PaintTool.HistoryNUM;
 			} catch (Exception d) {
 			}
+		}
+	}
+	
+	CycleMethod getGradientPattern(){
+		if(ToolPanel.rb8.isSelected()){
+			return MultipleGradientPaint.CycleMethod.NO_CYCLE;
+		}else if(ToolPanel.rb9.isSelected()){
+			return MultipleGradientPaint.CycleMethod.REFLECT;
+		}else{
+			return MultipleGradientPaint.CycleMethod.REPEAT;
 		}
 	}
 	
@@ -1319,6 +1333,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		curveside = new int[100];
 		curvecolor = new Color[100];
 		curvepattern = new float[100][4];
+		centerx = -1;
+		centery = -1;
 		img = new BufferedImage[PaintTool.HistoryNUM];
 		shaps = new Shape[PaintTool.HistoryNUM];
 		setchange = new boolean[PaintTool.HistoryNUM];
@@ -3798,536 +3814,75 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 					}
 				}
-			}else if (PaintTool.type == 17) {// Gradation
-				double gx1 = x1, gy1 = y1, gx2 = x1, gy2 = y1, gx3 = x2, gy3 = y2, gx4 = x2, gy4 = y2;
-				double k  = 1;
-				int r = (int)Math.round(Math.sqrt(Math.abs(x2 - x1)*Math.abs(x2 - x1) + Math.abs(y2 - y1)*Math.abs(y2 - y1)));
-				if(!ToolPanel.rb5.isSelected()){
-					if(x1 == x2){
-						gx1 = PaintTool.sizex;
-						gy1 = y1;
-						gx2 = 0;
-						gy2 = y1;
-						gx3 = PaintTool.sizex;
-						gy3 = y2;
-						gx4 = 0;
-						gy4 = y2;
-						k = 100;
-					}else if(y1 == y2){
-						gx1 = x1;
-						gy1 = 0;
-						gx2 = x1;
-						gy2 = PaintTool.sizey;
-						gx3 = x2;
-						gy3 = 0;
-						gx4 = x2;
-						gy4 = PaintTool.sizey;
-						k = 0;
-					}else{
-						k = -(double)1/((double)(y2 - y1)/(double)(x2 - x1));
-						if(Math.abs(k) <= 1 ){
-							if(gx1 <= PaintTool.sizex){
-								while(gx1 <= PaintTool.sizex){
-									gx1++;
-									gy1 += k;
-								}
-							}else{
-								while(gx1 >= PaintTool.sizex){
-									gx1--;
-									gy1 -= k;
-								}
-								gx1++;
-								gy1 += k;
-							}
-							if(gx2 >= 0){
-								while(gx2 >= 0){
-									gx2--;
-									gy2 -= k;
-								}
-							}else{
-								while(gx2 <= 0){
-									gx2++;
-									gy2 += k;
-								}
-								gx2--;
-								gy2 -= k;
-							}
-							if(gx3 <= PaintTool.sizex){
-								while(gx3 <= PaintTool.sizex){
-									gx3++;
-									gy3 += k;
-								}
-							}else{
-								while(gx3 >= PaintTool.sizex){
-									gx3--;
-									gy3 -= k;
-								}
-								gx3++;
-								gy3 += k;
-							}
-							if(gx4 >= 0){
-								while(gx4 >= 0){
-									gx4--;
-									gy4 -= k;
-								}
-							}else{
-								while(gx4 <= 0){
-									gx4++;
-									gy4 += k;
-								}
-								gx4--;
-								gy4 -= k;
-							}
-						}else{
-							if(gy1 <= PaintTool.sizey){
-								while(gy1 <= PaintTool.sizey){
-									gx1 += (1/k);
-									gy1 ++;
-								}
-							}else{
-								while(gy1 >= PaintTool.sizey){
-									gx1 -= (1/k);
-									gy1 --;
-								}
-								gx1 += (1/k);
-								gy1 ++;
-							}
-							if(gy2 >= 0){
-								while(gy2 >= 0){
-									gx2 -= (1/k);
-									gy2--;
-								}
-							}else{
-								while(gy2 <= 0){
-									gx2 += (1/k);
-									gy2++;
-								}
-								gx2 -= (1/k);
-								gy2--;
-							}
-							if(gy3 <= PaintTool.sizey){
-								while(gy3 <= PaintTool.sizey){
-									gx3 += (1/k);
-									gy3 ++;
-								}
-							}else{
-								while(gy3 >= PaintTool.sizey){
-									gx3 -= (1/k);
-									gy3 --;
-								}
-								gx3 += (1/k);
-								gy3 ++;
-							}
-							if(gy4 >= 0){
-								while(gy4 >= 0){
-									gx4 -= (1/k);
-									gy4--;
-								}
-							}else{
-								while(gy4 <= 0){
-									gx4 += (1/k);
-									gy4++;
-								}
-								gx4 -= (1/k);
-								gy4--;
-							}
-						}
-					}
-				}
+			}else if (PaintTool.type == 17) {// Gradaietion
 				if (debug || press) {
 					debug = true;
 					g3.drawImage(img[imgnum], 0, 0, this);
 					g3.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-					if(ToolPanel.rb3.isSelected() || ToolPanel.rb5.isSelected()){
-						g3.setColor(PaintTool.color[PaintTool.colornum]);
-						g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-					}else if(ToolPanel.rb4.isSelected()){
-						if(PaintTool.colornum < 23){
-							g3.setColor(PaintTool.color[PaintTool.colornum+1]);
-						}else{
-							g3.setColor(PaintTool.color[PaintTool.colornum]);
-						}
-						g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize2f()));
-					}
-					if(!ToolPanel.rb5.isSelected()){
-						if(Math.abs(k) <= 1 ){
-							if(x1<=x2 && y1<=y2){
-								x3[0] = 0;
-								y3[0] = PaintTool.sizey;
-								x3[1] = 0;
-								y3[1] = 0;
-								x3[2] = PaintTool.sizex;
-								y3[2] = 0;
-							}else if(x1<=x2 && y1>=y2){
-								x3[0] = 0;
-								y3[0] = 0;
-								x3[1] = 0;
-								y3[1] = PaintTool.sizey;
-								x3[2] = PaintTool.sizex;
-								y3[2] = PaintTool.sizey;
-							}else if(x1>=x2 && y1>=y2){
-								x3[0] = 0;
-								y3[0] = PaintTool.sizey;
-								x3[1] = PaintTool.sizex;
-								y3[1] = PaintTool.sizey;
-								x3[2] = PaintTool.sizex;
-								y3[2] = 0;
-							}else if(x1>=x2 && y1<=y2){
-								x3[0] = 0;
-								y3[0] = 0;
-								x3[1] = PaintTool.sizex;
-								y3[1] = 0;
-								x3[2] = PaintTool.sizex;
-								y3[2] = PaintTool.sizey;
-							}
-						}else{
-							if(x1<=x2 && y1<=y2){
-								x3[0] = PaintTool.sizex;
-								y3[0] = 0;
-								x3[1] = 0;
-								y3[1] = 0;
-								x3[2] = 0;
-								y3[2] = PaintTool.sizey;
-							}else if(x1<=x2 && y1>=y2){
-								x3[0] = 0;
-								y3[0] = 0;
-								x3[1] = 0;
-								y3[1] = PaintTool.sizey;
-								x3[2] = PaintTool.sizex;
-								y3[2] = PaintTool.sizey;
-							}else if(x1>=x2 && y1>=y2){
-								x3[0] = PaintTool.sizex;
-								y3[0] = 0;
-								x3[1] = PaintTool.sizex;
-								y3[1] = PaintTool.sizey;
-								x3[2] = 0;
-								y3[2] = PaintTool.sizey;
-							}else if(x1>=x2 && y1<=y2){
-								x3[0] = 0;
-								y3[0] = 0;
-								x3[1] = PaintTool.sizex;
-								y3[1] = 0;
-								x3[2] = PaintTool.sizex;
-								y3[2] = PaintTool.sizey;
-							}
-						}
-						x3[3] = (int)Math.round(gx1);
-						y3[3] = (int)Math.round(gy1);
-						x3[4] = (int)Math.round(gx2);
-						y3[4] = (int)Math.round(gy2);
-						g3.fillPolygon(x3, y3, 5);
-					}else{
-						g3.fillOval(x1 - r, y1 - r, 2*r, 2*r);
-					}
-					if(PaintTool.colornum < 23){
-						g3.setColor(PaintTool.color[PaintTool.colornum+1]);
-					}else{
-						g3.setColor(PaintTool.color[PaintTool.colornum]);
-					}
-					g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize2f()));
-					if(!ToolPanel.rb5.isSelected()){
-						if(Math.abs(k) <= 1 ){
-							if(x2<=x1 && y2<=y1){
-								x3[0] = 0;
-								y3[0] = PaintTool.sizey;
-								x3[1] = 0;
-								y3[1] = 0;
-								x3[2] = PaintTool.sizex;
-								y3[2] = 0;
-							}else if(x2<=x1 && y2>=y1){
-								x3[0] = 0;
-								y3[0] = 0;
-								x3[1] = 0;
-								y3[1] = PaintTool.sizey;
-								x3[2] = PaintTool.sizex;
-								y3[2] = PaintTool.sizey;
-							}else if(x2>=x1 && y2>=y1){
-								x3[0] = 0;
-								y3[0] = PaintTool.sizey;
-								x3[1] = PaintTool.sizex;
-								y3[1] = PaintTool.sizey;
-								x3[2] = PaintTool.sizex;
-								y3[2] = 0;
-							}else if(x2>=x1 && y2<=y1){
-								x3[0] = 0;
-								y3[0] = 0;
-								x3[1] = PaintTool.sizex;
-								y3[1] = 0;
-								x3[2] = PaintTool.sizex;
-								y3[2] = PaintTool.sizey;
-							}
-						}else{
-							if(x2<=x1 && y2<=y1){
-								x3[0] = PaintTool.sizex;
-								y3[0] = 0;
-								x3[1] = 0;
-								y3[1] = 0;
-								x3[2] = 0;
-								y3[2] = PaintTool.sizey;
-							}else if(x2<=x1 && y2>=y1){
-								x3[0] = 0;
-								y3[0] = 0;
-								x3[1] = 0;
-								y3[1] = PaintTool.sizey;
-								x3[2] = PaintTool.sizex;
-								y3[2] = PaintTool.sizey;
-							}else if(x2>=x1 && y2>=y1){
-								x3[0] = PaintTool.sizex;
-								y3[0] = 0;
-								x3[1] = PaintTool.sizex;
-								y3[1] = PaintTool.sizey;
-								x3[2] = 0;
-								y3[2] = PaintTool.sizey;
-							}else if(x2>=x1 && y2<=y1){
-								x3[0] = 0;
-								y3[0] = 0;
-								x3[1] = PaintTool.sizex;
-								y3[1] = 0;
-								x3[2] = PaintTool.sizex;
-								y3[2] = PaintTool.sizey;
-							}
-						}
-						x3[3] = (int)Math.round(gx3);
-						y3[3] = (int)Math.round(gy3);
-						x3[4] = (int)Math.round(gx4);
-						y3[4] = (int)Math.round(gy4);
-						g3.fillPolygon(x3, y3, 5);
-					}else{
-						Area are1 = new Area(new Rectangle(0, 0, PaintTool.sizex, PaintTool.sizey));
-						are1.subtract(new Area(new Ellipse2D.Float(x1 - r, y1 - r, 2*r, 2*r)));
-						g3.fill(are1);
-					}
-					if(ToolPanel.rb4.isSelected()){
-						g3.setColor(PaintTool.color[PaintTool.colornum]);
-						g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-						x3[1] = (int)Math.round(gx1);
-						y3[1] = (int)Math.round(gy1);
-						x3[2] = (int)Math.round(gx2);
-						y3[2] = (int)Math.round(gy2);
-						if(k > 0){
-							x3[0] = PaintTool.sizex;
-							y3[0] = PaintTool.sizey;
-							x3[3] = 0;
-							y3[3] = 0;
-						}else{
-							if(k >= -1){
-								x3[0] = PaintTool.sizex;
-								y3[0] = 0;
-								x3[3] = 0;
-								y3[3] = PaintTool.sizey;
+					g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
+					if(ToolPanel.rb1.isSelected()){//描く
+						if(ToolPanel.rb3.isSelected()){
+							float[] dist = {0.0f, 1.0f};
+							Color[] colors = {PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
+							LinearGradientPaint gradient;
+							gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, getGradientPattern());
+							g3.setPaint(gradient);
+							g3.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
+						}else if(ToolPanel.rb4.isSelected()){
+							float[] dist = {0.0f, 0.5f, 1.0f};
+							Color[] colors = {PaintTool.color[(PaintTool.colornum+1)%24], PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
+							LinearGradientPaint gradient;
+							gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, getGradientPattern());
+							g3.setPaint(gradient);
+							g3.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
+						}else{//円グラデーション
+							float[] dist = {0.0f, 1.0f};
+							Color[] colors = {PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
+							RadialGradientPaint gradient;
+							if(centerx == -1 && centery == -1){
+								gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), dist, colors, getGradientPattern());
 							}else{
-								x3[0] = 0;
-								y3[0] = PaintTool.sizey;
-								x3[3] = PaintTool.sizex;
-								y3[3] = 0;
+								gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), centerx, centery, dist, colors, getGradientPattern());
 							}
+							g3.setPaint(gradient);
+							g3.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
 						}
-						x3[4] = (int)Math.round(gx4);
-						y3[4] = (int)Math.round(gy4);
-						x3[5] = (int)Math.round(gx3);
-						y3[5] = (int)Math.round(gy3);
-						g3.fillPolygon(x3, y3, 6);
+					}else{//始点設定
+						g3.drawOval(centerx-1, centery-1, 2, 2);
 					}
 				} else {
 					if(regular){
-						if(ToolPanel.rb3.isSelected()){
-							g2.setColor(PaintTool.color[PaintTool.colornum]);
-							g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
-						}else if(ToolPanel.rb4.isSelected()){
-							if(PaintTool.colornum < 23){
-								g2.setColor(PaintTool.color[PaintTool.colornum+1]);
-							}else{
-								g2.setColor(PaintTool.color[PaintTool.colornum]);
-							}
-							g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize2f()));
-						}
+						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
 						g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-						if(!ToolPanel.rb5.isSelected()){
-							if(Math.abs(k) <= 1 ){
-								if(gy1 > gy3){
-									g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 + 1), (int)Math.round(gx2), (int)Math.round(gy2 + 1-1));
-									g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 + 1-1), (int)Math.round(gx2), (int)Math.round(gy2 + 1));
-									for (int i = 1; Math.round(gy1 + i) < PaintTool.sizey || Math.round(gy2 + i) < PaintTool.sizey; i++) {
-										g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 + i), (int)Math.round(gx2), (int)Math.round(gy2 + i));
-										g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 + i), (int)Math.round(gx2), (int)Math.round(gy2 + i+1));
-										g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 + i+1), (int)Math.round(gx2), (int)Math.round(gy2 + i));
-									}
-								}else{
-									g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 - 1), (int)Math.round(gx2), (int)Math.round(gy2 - 1+1));
-									g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 - 1+1), (int)Math.round(gx2), (int)Math.round(gy2 - 1));
-									for (int i = 1; Math.round(gy1 - i) > 0 || Math.round(gy2 - i) > 0; i++) {
-										g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 - i), (int)Math.round(gx2), (int)Math.round(gy2 - i));
-										g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 - i), (int)Math.round(gx2), (int)Math.round(gy2 - i-1));
-										g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 - i-1), (int)Math.round(gx2), (int)Math.round(gy2 - i));
-									}
-								}
-								int i = 0;
-								if(ToolPanel.rb3.isSelected()){
-									for (i = 0; i <= Math.abs(gy1 - gy3); i++) {
-										g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5() - (float)((PaintTool.getsize5() - PaintTool.getsize2f())* i / Math.abs(gy1 - gy3))));
-										if(PaintTool.colornum < 23){
-											g2.setColor(new Color(PaintTool.color[PaintTool.colornum].getRed() - (int)((PaintTool.color[PaintTool.colornum].getRed() - PaintTool.color[PaintTool.colornum+1].getRed()) * i / Math.abs(gy1 - gy3)),PaintTool.color[PaintTool.colornum].getGreen() - (int)((PaintTool.color[PaintTool.colornum].getGreen() - PaintTool.color[PaintTool.colornum+1].getGreen()) * i / Math.abs(gy1 - gy3)),PaintTool.color[PaintTool.colornum].getBlue() - (int)((PaintTool.color[PaintTool.colornum].getBlue() - PaintTool.color[PaintTool.colornum+1].getBlue()) * i / Math.abs(gy1 - gy3))));
-										}else{
-											g2.setColor(PaintTool.color[PaintTool.colornum]);
-										}
-										if(gy1 > gy3){
-											g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 - i), (int)Math.round(gx2), (int)Math.round(gy2 - i));
-											g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 - i), (int)Math.round(gx2), (int)Math.round(gy2 - i-1));
-											g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 - i-1), (int)Math.round(gx2), (int)Math.round(gy2 - i));
-										}else{
-											g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 + i), (int)Math.round(gx2), (int)Math.round(gy2 + i));
-											g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 + i), (int)Math.round(gx2), (int)Math.round(gy2 + i+1));
-											g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 + i+1), (int)Math.round(gx2), (int)Math.round(gy2 + i));
-										}
-									}
-								}else{
-									for (i = 0; i <= Math.abs(gy1 - gy3); i++) {
-										g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5() - (float)((PaintTool.getsize5() - PaintTool.getsize2f())* Math.abs(Math.abs(gy1 - gy3)/2 - i) / Math.abs(gy1 - gy3)*2)));
-										if(PaintTool.colornum < 23){
-											g2.setColor(new Color(PaintTool.color[PaintTool.colornum].getRed() - (int)((PaintTool.color[PaintTool.colornum].getRed() - PaintTool.color[PaintTool.colornum+1].getRed()) * Math.abs(Math.abs(gy1 - gy3)/2 - i) / Math.abs(gy1 - gy3)*2),PaintTool.color[PaintTool.colornum].getGreen() - (int)((PaintTool.color[PaintTool.colornum].getGreen() - PaintTool.color[PaintTool.colornum+1].getGreen()) * Math.abs(Math.abs(gy1 - gy3)/2 - i) / Math.abs(gy1 - gy3)*2),PaintTool.color[PaintTool.colornum].getBlue() - (int)((PaintTool.color[PaintTool.colornum].getBlue() - PaintTool.color[PaintTool.colornum+1].getBlue()) * Math.abs(Math.abs(gy1 - gy3)/2 - i) / Math.abs(gy1 - gy3)*2)));
-										}else{
-											g2.setColor(PaintTool.color[PaintTool.colornum]);
-										}
-										if(gy1 > gy3){
-											g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 - i), (int)Math.round(gx2), (int)Math.round(gy2 - i));
-											g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 - i), (int)Math.round(gx2), (int)Math.round(gy2 - i-1));
-											g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 - i-1), (int)Math.round(gx2), (int)Math.round(gy2 - i));
-										}else{
-											g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 + i), (int)Math.round(gx2), (int)Math.round(gy2 + i));
-											g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 + i), (int)Math.round(gx2), (int)Math.round(gy2 + i+1));
-											g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 + i+1), (int)Math.round(gx2), (int)Math.round(gy2 + i));
-										}
-									}
-								}
-								g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize2f()));
-								if(PaintTool.colornum < 23){
-									g2.setColor(PaintTool.color[PaintTool.colornum+1]);
-								}else{
-									g2.setColor(PaintTool.color[PaintTool.colornum]);
-								}
-								if(gy1 > gy3){
-									for (; Math.round(gy1 - i) > 0 || Math.round(gy2 - i) > 0; i++) {
-										g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 - i), (int)Math.round(gx2), (int)Math.round(gy2 - i));
-										g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 - i), (int)Math.round(gx2), (int)Math.round(gy2 - i-1));
-										g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 - i-1), (int)Math.round(gx2), (int)Math.round(gy2 - i));
-									}
-								}else{
-									for (; Math.round(gy1 + i) < PaintTool.sizey || Math.round(gy2 + i) < PaintTool.sizey; i++) {
-										g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 + i), (int)Math.round(gx2), (int)Math.round(gy2 + i));
-										g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 + i), (int)Math.round(gx2), (int)Math.round(gy2 + i+1));
-										g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1 + i+1), (int)Math.round(gx2), (int)Math.round(gy2 + i));
-									}
-								}
+						if(ToolPanel.rb1.isSelected()){//描く
+							if(ToolPanel.rb3.isSelected()){
+								float[] dist = {0.0f, 1.0f};
+								Color[] colors = {PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
+								LinearGradientPaint gradient;
+								gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, getGradientPattern());
+								g2.setPaint(gradient);
+								g2.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
+							}else if(ToolPanel.rb4.isSelected()){
+								float[] dist = {0.0f, 0.5f, 1.0f};
+								Color[] colors = {PaintTool.color[(PaintTool.colornum+1)%24], PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
+								LinearGradientPaint gradient;
+								gradient = new LinearGradientPaint(x1, y1, x2, y2, dist, colors, getGradientPattern());
+								g2.setPaint(gradient);
+								g2.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
 							}else{
-								if(gx1 > gx3){
-									g2.drawLine((int)Math.round(gx1 + 1), (int)Math.round(gy1), (int)Math.round(gx2 + 1-1), (int)Math.round(gy2));
-									g2.drawLine((int)Math.round(gx1 + 1-1), (int)Math.round(gy1), (int)Math.round(gx2 + 1), (int)Math.round(gy2));
-									for (int i = 1; Math.round(gx1 + i) < PaintTool.sizex || Math.round(gx2 + i) < PaintTool.sizex; i++) {
-										g2.drawLine((int)Math.round(gx1 + i), (int)Math.round(gy1), (int)Math.round(gx2 + i), (int)Math.round(gy2));
-										g2.drawLine((int)Math.round(gx1 + i), (int)Math.round(gy1), (int)Math.round(gx2 + i+1), (int)Math.round(gy2));
-										g2.drawLine((int)Math.round(gx1 + i+1), (int)Math.round(gy1), (int)Math.round(gx2 + i), (int)Math.round(gy2));
-									}
+								float[] dist = {0.0f, 1.0f};
+								Color[] colors = {PaintTool.color[PaintTool.colornum], PaintTool.color[(PaintTool.colornum+1)%24]};
+								RadialGradientPaint gradient;
+								if(centerx == -1 && centery == -1){
+									gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), dist, colors, getGradientPattern());
 								}else{
-									g2.drawLine((int)Math.round(gx1 - 1), (int)Math.round(gy1), (int)Math.round(gx2 - 1+1), (int)Math.round(gy2));
-									g2.drawLine((int)Math.round(gx1 - 1+1), (int)Math.round(gy1), (int)Math.round(gx2 - 1), (int)Math.round(gy2));
-									for (int i = 1; Math.round(gx1 - i) > 0 || Math.round(gx2 - i) > 0; i++) {
-										g2.drawLine((int)Math.round(gx1 - i), (int)Math.round(gy1), (int)Math.round(gx2 - i), (int)Math.round(gy2));
-										g2.drawLine((int)Math.round(gx1 - i), (int)Math.round(gy1), (int)Math.round(gx2 - i-1), (int)Math.round(gy2));
-										g2.drawLine((int)Math.round(gx1 - i-1), (int)Math.round(gy1), (int)Math.round(gx2 - i), (int)Math.round(gy2));
-									}
+									gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), centerx, centery, dist, colors, getGradientPattern());
 								}
-								int i = 0;
-								if(ToolPanel.rb3.isSelected()){
-									for (i = 0; i <= Math.abs(gx1 - gx3); i++) {
-										g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5() - (float)((PaintTool.getsize5() - PaintTool.getsize2f())* i / Math.abs(gx1 - gx3))));
-										if(PaintTool.colornum < 23){
-											g2.setColor(new Color(PaintTool.color[PaintTool.colornum].getRed() - (int)((PaintTool.color[PaintTool.colornum].getRed() - PaintTool.color[PaintTool.colornum+1].getRed()) * i / Math.abs(gx1 - gx3)),PaintTool.color[PaintTool.colornum].getGreen() - (int)((PaintTool.color[PaintTool.colornum].getGreen() - PaintTool.color[PaintTool.colornum+1].getGreen()) * i / Math.abs(gx1 - gx3)),PaintTool.color[PaintTool.colornum].getBlue() - (int)((PaintTool.color[PaintTool.colornum].getBlue() - PaintTool.color[PaintTool.colornum+1].getBlue()) * i / Math.abs(gx1 - gx3))));
-										}else{
-											g2.setColor(PaintTool.color[PaintTool.colornum]);
-										}
-										if(gx1 > gx3){
-											g2.drawLine((int)Math.round(gx1 - i), (int)Math.round(gy1), (int)Math.round(gx2 - i), (int)Math.round(gy2));
-											g2.drawLine((int)Math.round(gx1 - i), (int)Math.round(gy1), (int)Math.round(gx2 - i-1), (int)Math.round(gy2));
-											g2.drawLine((int)Math.round(gx1 - i-1), (int)Math.round(gy1), (int)Math.round(gx2 - i), (int)Math.round(gy2));
-										}else{
-											g2.drawLine((int)Math.round(gx1 + i), (int)Math.round(gy1), (int)Math.round(gx2 + i), (int)Math.round(gy2));
-											g2.drawLine((int)Math.round(gx1 + i), (int)Math.round(gy1), (int)Math.round(gx2 + i+1), (int)Math.round(gy2));
-											g2.drawLine((int)Math.round(gx1 + i+1), (int)Math.round(gy1), (int)Math.round(gx2 + i), (int)Math.round(gy2));
-										}
-									}
-								}else{
-									for (i = 0; i <= Math.abs(gx1 - gx3); i++) {
-										g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5() - (float)((PaintTool.getsize5() - PaintTool.getsize2f())* Math.abs(Math.abs(gx1 - gx3)/2 - i) / Math.abs(gx1 - gx3)*2)));
-										if(PaintTool.colornum < 23){
-											g2.setColor(new Color(PaintTool.color[PaintTool.colornum].getRed() - (int)((PaintTool.color[PaintTool.colornum].getRed() - PaintTool.color[PaintTool.colornum+1].getRed()) * Math.abs(Math.abs(gx1 - gx3)/2 - i) / Math.abs(gx1 - gx3)*2),PaintTool.color[PaintTool.colornum].getGreen() - (int)((PaintTool.color[PaintTool.colornum].getGreen() - PaintTool.color[PaintTool.colornum+1].getGreen()) * Math.abs(Math.abs(gx1 - gx3)/2 - i) / Math.abs(gx1 - gx3)*2),PaintTool.color[PaintTool.colornum].getBlue() - (int)((PaintTool.color[PaintTool.colornum].getBlue() - PaintTool.color[PaintTool.colornum+1].getBlue()) * Math.abs(Math.abs(gx1 - gx3)/2 - i) / Math.abs(gx1 - gx3)*2)));
-										}else{
-											g2.setColor(PaintTool.color[PaintTool.colornum]);
-										}
-										if(gx1 > gx3){
-											g2.drawLine((int)Math.round(gx1 - i), (int)Math.round(gy1), (int)Math.round(gx2 - i), (int)Math.round(gy2));
-											g2.drawLine((int)Math.round(gx1 - i), (int)Math.round(gy1), (int)Math.round(gx2 - i-1), (int)Math.round(gy2));
-											g2.drawLine((int)Math.round(gx1 - i-1), (int)Math.round(gy1), (int)Math.round(gx2 - i), (int)Math.round(gy2));
-										}else{
-											g2.drawLine((int)Math.round(gx1 + i), (int)Math.round(gy1), (int)Math.round(gx2 + i), (int)Math.round(gy2));
-											g2.drawLine((int)Math.round(gx1 + i), (int)Math.round(gy1), (int)Math.round(gx2 + i+1), (int)Math.round(gy2));
-											g2.drawLine((int)Math.round(gx1 + i+1), (int)Math.round(gy1), (int)Math.round(gx2 + i), (int)Math.round(gy2));
-										}
-									}
-								}
-								g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize2f()));
-								if(PaintTool.colornum < 23){
-									g2.setColor(PaintTool.color[PaintTool.colornum+1]);
-								}else{
-									g2.setColor(PaintTool.color[PaintTool.colornum]);
-								}
-								if(gx1 > gx3){
-									for (; Math.round(gx1 - i) > 0 || Math.round(gx2 - i) > 0; i++) {
-										g2.drawLine((int)Math.round(gx1 - i), (int)Math.round(gy1), (int)Math.round(gx2 - i), (int)Math.round(gy2));
-										g2.drawLine((int)Math.round(gx1 - i), (int)Math.round(gy1), (int)Math.round(gx2 - i-1), (int)Math.round(gy2));
-										g2.drawLine((int)Math.round(gx1 - i-1), (int)Math.round(gy1), (int)Math.round(gx2 - i), (int)Math.round(gy2));
-									}
-								}else{
-									for (; Math.round(gx1 + i) < PaintTool.sizex || Math.round(gx2 + i) < PaintTool.sizex; i++) {
-										g2.drawLine((int)Math.round(gx1 + i), (int)Math.round(gy1), (int)Math.round(gx2 + i), (int)Math.round(gy2));
-										g2.drawLine((int)Math.round(gx1 + i), (int)Math.round(gy1), (int)Math.round(gx2 + i+1), (int)Math.round(gy2));
-										g2.drawLine((int)Math.round(gx1 + i+1), (int)Math.round(gy1), (int)Math.round(gx2 + i), (int)Math.round(gy2));
-									}
-								}
+							g2.setPaint(gradient);
+								g2.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
 							}
-						}else{
-							int i = 0;
-							for (i = 0; i < r; i++) {
-								g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5() - (float)((PaintTool.getsize5() - PaintTool.getsize2f())* i / r)));
-								if(PaintTool.colornum < 23){
-									g2.setColor(new Color(PaintTool.color[PaintTool.colornum].getRed() - (int)((PaintTool.color[PaintTool.colornum].getRed() - PaintTool.color[PaintTool.colornum+1].getRed()) * i / r),PaintTool.color[PaintTool.colornum].getGreen() - (int)((PaintTool.color[PaintTool.colornum].getGreen() - PaintTool.color[PaintTool.colornum+1].getGreen()) * i / r),PaintTool.color[PaintTool.colornum].getBlue() - (int)((PaintTool.color[PaintTool.colornum].getBlue() - PaintTool.color[PaintTool.colornum+1].getBlue()) * i / r)));
-								}else{
-									g2.setColor(PaintTool.color[PaintTool.colornum]);
-								}
-								g2.drawOval(x1 - i, y1 - i, 2*i, 2*i);
-								g2.drawOval(x1 - i-1, y1 - i, 2*i+2, 2*i);
-								g2.drawOval(x1 - i, y1 - i-1, 2*i, 2*i+2);
-							}
-							g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize2f()));
-							if(PaintTool.colornum < 23){
-								g2.setColor(PaintTool.color[PaintTool.colornum+1]);
-							}else{
-								g2.setColor(PaintTool.color[PaintTool.colornum]);
-							}
-							int maxr = (int)Math.round(Math.sqrt(Math.abs(0 - x1)*Math.abs(0 - x1) + Math.abs(0 - y1)*Math.abs(0 - y1)));
-							if(maxr < (int)Math.round(Math.sqrt(Math.abs(PaintTool.sizex - x1)*Math.abs(PaintTool.sizex - x1) + Math.abs(0 - y1)*Math.abs(0 - y1)))){
-								maxr = (int)Math.round(Math.sqrt(Math.abs(PaintTool.sizex - x1)*Math.abs(PaintTool.sizex - x1) + Math.abs(0 - y1)*Math.abs(0 - y1)));
-							}
-							if(maxr < (int)Math.round(Math.sqrt(Math.abs(PaintTool.sizex - x1)*Math.abs(PaintTool.sizex - x1) + Math.abs(PaintTool.sizey - y1)*Math.abs(PaintTool.sizey - y1)))){
-								maxr = (int)Math.round(Math.sqrt(Math.abs(PaintTool.sizex - x1)*Math.abs(PaintTool.sizex - x1) + Math.abs(PaintTool.sizey - y1)*Math.abs(PaintTool.sizey - y1)));
-							}
-							if(maxr < (int)Math.round(Math.sqrt(Math.abs(0 - x1)*Math.abs(0 - x1) + Math.abs(PaintTool.sizey - y1)*Math.abs(PaintTool.sizey - y1)))){
-								maxr = (int)Math.round(Math.sqrt(Math.abs(0 - x1)*Math.abs(0 - x1) + Math.abs(PaintTool.sizey - y1)*Math.abs(PaintTool.sizey - y1)));
-							}
-							for (; i <= maxr; i++) {
-								g2.drawOval(x1 - i, y1 - i, 2*i, 2*i);
-								g2.drawOval(x1 - i-1, y1 - i, 2*i+2, 2*i);
-								g2.drawOval(x1 - i, y1 - i-1, 2*i, 2*i+2);
-							}
+						}else{//始点設定
+							g3.drawOval(centerx-1, centery-1, 2, 2);
 						}
 					}
 				}
@@ -5490,20 +5045,27 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					PaintTool.p5.l11.setText("");
 					repaint();
 			}else if(PaintTool.type == 17){
-				PaintTool.drawcation(true);
-				Timer timer = new Timer();
-				timer.schedule(new TimerTask() {public void run() {
-					capt = true;
-					listname = "グラデーション";
-					debug = false;
-					regular = true;
-					PaintTool.p5.l8.setText("");
-					PaintTool.p5.l9.setText("");
-					PaintTool.p5.l10.setText("");
-					PaintTool.p5.l11.setText("");
+				if(ToolPanel.rb1.isSelected()){
+					PaintTool.drawcation(true);
+					Timer timer = new Timer();
+					timer.schedule(new TimerTask() {public void run() {
+						capt = true;
+						listname = "グラデーション";
+						debug = false;
+						regular = true;
+						PaintTool.p5.l8.setText("");
+						PaintTool.p5.l9.setText("");
+						PaintTool.p5.l10.setText("");
+						PaintTool.p5.l11.setText("");
+						PaintTool.rewrite();
+					}}
+					, 1);
+				}else{
+					centerx = x2;
+					centery = y2;
+					debug = true;
 					PaintTool.rewrite();
-				}}
-				, 1);
+				}
 			}else if (PaintTool.type == 20) {
 				move = 0;
 				if(ToolPanel.rb2.isSelected()){
@@ -5739,9 +5301,22 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				y1 = (int)(((double)e.getY())/PaintTool.scale);
 				regular = true;
 				repaint();
-			}else if (PaintTool.type >= 0 && PaintTool.type <= 4 || PaintTool.type == 17|| PaintTool.type == 18) {
+			}else if (PaintTool.type >= 0 && PaintTool.type <= 4 || PaintTool.type == 18) {
 				x2 = (int)(((double)e.getX())/PaintTool.scale);
 				y2 = (int)(((double)e.getY())/PaintTool.scale);
+				debug = true;
+				PaintTool.p5.l9.setText(String.valueOf((int)(((double)e.getX())/PaintTool.scale) - x1));
+				PaintTool.p5.l11.setText(String.valueOf((int)(((double)e.getY())/PaintTool.scale) - y1));
+				repaint();
+			}else if (PaintTool.type == 17) {
+				if(ToolPanel.rb1.isSelected()){
+					x2 = (int)(((double)e.getX())/PaintTool.scale);
+					y2 = (int)(((double)e.getY())/PaintTool.scale);
+					
+				}else{
+					centerx = (int)(((double)e.getX())/PaintTool.scale);
+					centery = (int)(((double)e.getY())/PaintTool.scale);
+				}
 				debug = true;
 				PaintTool.p5.l9.setText(String.valueOf((int)(((double)e.getX())/PaintTool.scale) - x1));
 				PaintTool.p5.l11.setText(String.valueOf((int)(((double)e.getY())/PaintTool.scale) - y1));
