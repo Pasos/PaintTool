@@ -18,8 +18,8 @@ public class ComandPanel extends JPanel implements ActionListener {
 	public JTextField t1;
 	private JLabel l1, l2, l3;
 	public JLabel l4, l5, l6, l7, l8, l9, l10, l11;
-	public static JButton b2, b3, b4, b5, b6, b7, b8, b9, b10, b11,b12,b13,b14,b15,b16;
-	ImageIcon i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13,i14,i15,i16;
+	public static JButton b2, b3, b4, b5, b6, b7, b8, b9, b10, b11,b12,b13,b14,b15,b16,b17;
+	ImageIcon i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13,i14,i15,i16,i17;
 	public static float tmpx = 0, tmpy = 0;
 	JPanel p;
     
@@ -102,9 +102,14 @@ public class ComandPanel extends JPanel implements ActionListener {
 		b15.setBackground(Color.white);
 		i16 = new ImageIcon(getClass().getResource("ストローク.png"));
 		b16 = new JButton(i16);
-		b16.setToolTipText("ストローク設定");
+		b16.setToolTipText("ストローク");
 		b16.setMargin(new Insets(0,0,0,0));
 		b16.setBackground(Color.white);
+		i17 = new ImageIcon(getClass().getResource("塗り潰し色.png"));
+		b17 = new JButton(i17);
+		b17.setToolTipText("塗り潰し色");
+		b17.setMargin(new Insets(0,0,0,0));
+		b17.setBackground(Color.white);
 		l1 = new JLabel("ｽｹｰﾙ");
 		t1 = new JTextField("1", 5);
 		l2 = new JLabel("倍");
@@ -146,6 +151,7 @@ public class ComandPanel extends JPanel implements ActionListener {
 		add(b10);
 		add(b14);
 		add(b16);
+		add(b17);
 		add(l4);
 		add(l5);
 		add(l6);
@@ -171,6 +177,7 @@ public class ComandPanel extends JPanel implements ActionListener {
 		b14.addActionListener(this);
 		b15.addActionListener(this);
 		b16.addActionListener(this);
+		b17.addActionListener(this);
 		t1.addActionListener(this);
 	}
 
@@ -265,6 +272,14 @@ public class ComandPanel extends JPanel implements ActionListener {
 			}else{
 				PaintTool.strokeVisible();
 				PaintTool.strokem.setSelected(true);
+			}
+		}else if (e.getSource() == b17) { // 塗り潰し色
+			if(PaintTool.p16.isVisible()){
+				PaintTool.fillInvisible();
+				PaintTool.fillm.setSelected(false);
+			}else{
+				PaintTool.fillVisible();
+				PaintTool.fillm.setSelected(true);
 			}
 		}
 	}

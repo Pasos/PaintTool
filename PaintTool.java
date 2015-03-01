@@ -82,12 +82,13 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 	static ColorFrame p13;
 	static RulerFrame p14;
 	static StrokeFrame p15;
+	static FillFrame p16;
 	static public JScrollPane scrollpane;
 	static public JPopupMenu popup;
 	static  public JMenuItem copyMenuItem, pasteMenuItem;
 	static JMenuItem savem, undom, redom, copym, pastem;
 	static JRadioButtonMenuItem bmpm, jpgm, pngm, gifm;
-	static  public JCheckBoxMenuItem historym, selectm, viewm, toolm, hsvm, rulerm, strokem;
+	static  public JCheckBoxMenuItem historym, selectm, viewm, toolm, hsvm, rulerm, strokem, fillm;
 	static JMenuBar menubar;
 
 	/* ★★入出力系★★ */
@@ -385,6 +386,14 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 	static void strokeInvisible() {
 		p15.invisible();
 	}
+	
+	static void fillVisible() {
+		p16.visible();
+	}
+
+	static void fillInvisible() {
+		p16.invisible();
+	}
 
 	static void historyVisible() {
 		p10.visible();
@@ -507,6 +516,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		p13 = new ColorFrame();
 		p14 = new RulerFrame();
 		p15 = new StrokeFrame();
+		p16 = new FillFrame();
 		p4.setAlwaysOnTop(true);
 		p7.setAlwaysOnTop(true);
 		p8.setAlwaysOnTop(true);
@@ -658,7 +668,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		toolm = new JCheckBoxMenuItem("ツール", false);
 		hsvm = new JCheckBoxMenuItem("HSV色選択", false);
 		strokem = new JCheckBoxMenuItem("ストローク", false);
-		
+		fillm = new JCheckBoxMenuItem("塗り潰し色", false);
 		
 		JMenuItem verm = new JMenuItem("バージョン情報");
 
@@ -691,6 +701,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		Menu4.add(toolm);
 		Menu4.add(hsvm);
 		Menu4.add(strokem);
+		Menu4.add(fillm);
 
 		Menu5.add(verm);
 
@@ -724,12 +735,16 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		toolm.addActionListener(this);
 		hsvm.addActionListener(this);
 		rulerm.addActionListener(this);
+		strokem.addActionListener(this);
+		fillm.addActionListener(this);
 		historym.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.CTRL_DOWN_MASK));
 		selectm.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_DOWN_MASK));
 		viewm.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_DOWN_MASK));
 		toolm.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.CTRL_DOWN_MASK));
 		hsvm.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK));
 		rulerm.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK));
+		strokem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_DOWN_MASK));
+		fillm.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK));
 		
 		
 		verm.addActionListener(this);
@@ -850,6 +865,22 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 			}else{
 				rulerVisible();
 				rulerm.setSelected(true);
+			}
+		}else if (e.getActionCommand() == "ストローク"){
+			if(p15.isVisible()){
+				strokeInvisible();
+				strokem.setSelected(false);
+			}else{
+				strokeVisible();
+				strokem.setSelected(true);
+			}
+		}else if (e.getActionCommand() == "塗り潰し色"){
+			if(p16.isVisible()){
+				fillInvisible();
+				fillm.setSelected(false);
+			}else{
+				fillVisible();
+				fillm.setSelected(true);
 			}
 		}else if (e.getActionCommand() == "バージョン情報"){
 			JOptionPane pane = new JOptionPane("Ver 26.3\nさすがにもうバグ無いよね・・・",JOptionPane.INFORMATION_MESSAGE);

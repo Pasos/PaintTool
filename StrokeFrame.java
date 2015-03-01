@@ -64,10 +64,10 @@ public class StrokeFrame extends JFrame implements ActionListener {
 	/*★★コンストラクタ★★*/
 	StrokeFrame() {
 
-	    setTitle("破線");
-	    setSize(200, 270);
+	    setTitle("ストローク設定");
+	    setSize(200, 250);
 	    Container c = getContentPane();
-	    c.setLayout(new GridLayout(8, 1));
+	    c.setLayout(new GridLayout(7, 1));
 	    
 	    
 	    l1 = new JLabel("縁");
