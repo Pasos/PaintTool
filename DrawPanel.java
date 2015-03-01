@@ -460,7 +460,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		if(FillFrame.r1.isSelected() || FillFrame.img == null){
 			g.setColor(PaintTool.getColor());
 		}else{
-			 g.setPaint(new TexturePaint(FillFrame.img, new Rectangle2D.Double(x1, y1, FillFrame.img.getWidth(), FillFrame.img.getHeight())));
+			g.setPaint(new TexturePaint(FillFrame.imgscal, new Rectangle2D.Double(x1, y1, FillFrame.imgscal.getWidth(), FillFrame.imgscal.getHeight())));
 		}
 	}
 		
