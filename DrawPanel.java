@@ -2681,6 +2681,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 								y1 - rectText.height/2+fm.getMaxAscent() + PaintTool.getMozisize()*1/25*dy[MoziFrame.cb2.getSelectedIndex()]);
 					}
 					g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
+					setColor(g3);
 					g3.drawString(PaintTool.getMozi(), x1 - rectText.width/2, y1 - rectText.height/2+fm.getMaxAscent());
 				} else {
 					if(regular == true){
@@ -2708,6 +2709,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 								- rectText.height/2+fm.getMaxAscent() + PaintTool.getMozisize()*1/25*dy[MoziFrame.cb2.getSelectedIndex()]);
 						}
 						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
+						setColor(g2);
 						g2.drawString(PaintTool.getMozi(), x1 - rectText.width/2, y1
 							- rectText.height/2+fm.getMaxAscent());
 					}
@@ -4051,10 +4053,12 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					}else{
 						g3.drawLine((int)Math.round(gx1), (int)Math.round(gy1), (int)Math.round(gx2), (int)Math.round(gy2));
 					}
-					if(PaintTool.colornum < 23){
-						g3.setColor(PaintTool.color[PaintTool.colornum+1]);
-					}else{
-						g3.setColor(PaintTool.color[PaintTool.colornum]);
+					if(FillFrame.r1.isSelected()){
+						if(PaintTool.colornum < 23){
+							g3.setColor(PaintTool.color[PaintTool.colornum+1]);
+						}else{
+							g3.setColor(PaintTool.color[PaintTool.colornum]);
+						}
 					}
 					if(ToolPanel.cb1.isSelected()){
 						if(ToolPanel.rb1.isSelected()){
@@ -4113,10 +4117,12 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 						}else{
 							g2.drawLine((int)Math.round(gx1), (int)Math.round(gy1), (int)Math.round(gx2), (int)Math.round(gy2));
 						}
-						if(PaintTool.colornum < 23){
-							g2.setColor(PaintTool.color[PaintTool.colornum+1]);
-						}else{
-							g2.setColor(PaintTool.color[PaintTool.colornum]);
+						if(FillFrame.r1.isSelected()){
+							if(PaintTool.colornum < 23){
+								g2.setColor(PaintTool.color[PaintTool.colornum+1]);
+							}else{
+								g2.setColor(PaintTool.color[PaintTool.colornum]);
+							}
 						}
 						if(ToolPanel.cb1.isSelected()){
 							if(ToolPanel.rb1.isSelected()){

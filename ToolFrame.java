@@ -26,9 +26,9 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 		
 		
 		setTitle("ツール");
-		setSize(150, 288);
+		setSize(150, 248);
 		Container c = getContentPane();
-		c.setLayout(new GridLayout(7, 4));
+		c.setLayout(new GridLayout(6, 4));
 		i1 = new ImageIcon(getClass().getResource("直線.png"));
 		i2 = new ImageIcon(getClass().getResource("線.png"));
 		i3 = new ImageIcon(getClass().getResource("曲線.png"));
