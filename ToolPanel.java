@@ -1000,6 +1000,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 					add(l7);
 					l7.setText("色数");
 					add(t6);
+					t6.setText("1");
 					add(cb3);
 					add(cb4);
 				} else if (cb.getSelectedItem() == "文字") { // 文字
