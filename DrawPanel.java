@@ -50,7 +50,7 @@ import javax.swing.JPanel;
 public class DrawPanel extends JPanel implements MouseListener, MouseMotionListener {
 
 	private static final long serialVersionUID = 2L;
-	
+
 	public int oldx, oldy, tentenphase;
 	public static int x1, x2, y1, y2, curvex, curvey, curvex2, curvey2, arcx1, arcy1, arcx2, arcy2, imgnum = 0, startimg = 0, endimg = 0, start2img = 0, end2img = 0,pcnt = 0, pcnt2 = 0, move = 0, setx1, setx2, sety1, sety2, ssetx1, ssety1, rotatex2, rotatey2, originalrotate = 0, copyx, copyy, distancecount, centerx, centery;
 	public int[] x3, y3, x4 ,y4, curvesize, curveside;
@@ -79,8 +79,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 	void rewrite() {
 		repaint();
 	}
-	
-	
+
+
 	//ネガポジ変換
 	public BufferedImage negaposi(BufferedImage img){
 		for(int y = 0; y < img.getHeight(); y++){
@@ -89,10 +89,10 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				rgb = -rgb +16777215; //r, g, bの色の値を反転 16777215(FFFFFF)
 				img.setRGB(x, y, rgb);
 			}
-		} 
+		}
 		return img;
 	}
-	
+
 	//選択範囲開放処理
 	void leaveArea(){
 		set = false;
@@ -113,7 +113,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		g2.scale((float)PaintTool.ratiox/(float)100, (float)PaintTool.ratioy/(float)100);
 		g2.rotate(-PaintTool.spin*Math.PI/180, rotatex2, rotatey2);
 		if(!(SelectOptionFrame.rb7.isSelected())){
-			g2.drawImage(imgin,pointrotatex((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), pointrotatey((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), this);
+			blendImage(g2, are1);
+			//g2.drawImage(imgin,pointrotatex((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), pointrotatey((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), this);
 		}
 		g2.rotate(PaintTool.spin*Math.PI/180, rotatex2, rotatey2);
 		g2.scale((float)100/(float)PaintTool.ratiox, (float)100/(float)PaintTool.ratioy);
@@ -129,8 +130,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			g3.drawImage(img[imgnum], 0, 0, this);
 		}
 	}
-	
-	
+
+
 	//名前をつけて保存
 	void save() {
 		JFrame jFrame = new JFrame();
@@ -171,7 +172,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 						ImageIO.write(img[imgnum], "gif", file);
 					}
 				}
-				
+
 				PaintTool.savem.setEnabled(true);
 				ComandPanel.b12.setEnabled(true);
 			} catch (Exception d) {
@@ -181,7 +182,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		flDialog.dispose();
 		jFrame.dispose();
 	}
-	
+
 	//上書き保存
 	void save2() {
 		try {
@@ -239,7 +240,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		flDialog.dispose();
 		jFrame.dispose();
 	}
-	
+
 	//選択範囲の画像をキャンパスに転写
 	void selectRectDraw() {
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, SelectOptionFrame.gettrans()));
@@ -256,7 +257,28 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		g2.setClip(null);
 	}
 
-	
+	public void blendImage(Graphics2D g, Area area){
+		BufferedImage bgimg = new BufferedImage(img[imgnum].getWidth(), img[imgnum].getHeight(), BufferedImage.TYPE_INT_RGB);
+		bgimg.setData(img[imgnum].getData());
+		BufferedImage tmpimg = new BufferedImage(img[imgnum].getWidth(), img[imgnum].getHeight(), BufferedImage.TYPE_INT_RGB);
+		if(SelectOptionFrame.cb.getSelectedItem() == "上書き"){
+			tmpimg = Blend.execute(imgin, bgimg, (int)area.getBounds().getX(), (int)area.getBounds().getY(),Blend.Mode.MODE_NORMAL);
+		}else if(SelectOptionFrame.cb.getSelectedItem() == "乗算"){
+			tmpimg = Blend.execute(imgin, bgimg, (int)area.getBounds().getX(), (int)area.getBounds().getY(),Blend.Mode.MODE_MULTIPLE);
+		}else if(SelectOptionFrame.cb.getSelectedItem() == "スクリーン"){
+			tmpimg = Blend.execute(imgin, bgimg, (int)area.getBounds().getX(), (int)area.getBounds().getY(),Blend.Mode.MODE_SCREEN);
+		}else if(SelectOptionFrame.cb.getSelectedItem() == "オーバーレイ"){
+			tmpimg = Blend.execute(imgin, bgimg, (int)area.getBounds().getX(), (int)area.getBounds().getY(),Blend.Mode.MODE_OVERLAY);
+		}else if(SelectOptionFrame.cb.getSelectedItem() == "ソフトライト"){
+			tmpimg = Blend.execute(imgin, bgimg, (int)area.getBounds().getX(), (int)area.getBounds().getY(),Blend.Mode.MODE_SOFTRIGHT);
+		}else if(SelectOptionFrame.cb.getSelectedItem() == "ハードライト"){
+			tmpimg = Blend.execute(imgin, bgimg, (int)area.getBounds().getX(), (int)area.getBounds().getY(),Blend.Mode.MODE_HARDLIGHT);
+		}else if(SelectOptionFrame.cb.getSelectedItem() == "覆い焼き"){
+			tmpimg = Blend.execute(imgin, bgimg, (int)area.getBounds().getX(), (int)area.getBounds().getY(),Blend.Mode.MODE_DODGE);
+		}
+		g.drawImage(tmpimg, 0, 0, this);
+	}
+
 	public void capture() {
 		Area are = new Area(shap);
 		AffineTransform tran = new AffineTransform();
@@ -278,7 +300,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			g4.dispose();
 		}
 	}
-	
+
 	public void imgincopy(){
 		Area are = new Area(shap);
 		if(imgin != null){
@@ -289,7 +311,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				AffineTransform at = AffineTransform.getScaleInstance(-1.0, 1.0);
 				at.translate(-are.getBounds().getWidth(), 0);
 				g4.drawImage(imgintmp, at, this);
-				
+
 				AffineTransform at2 = AffineTransform.getTranslateInstance(-shap.getBounds().getMinX(), -shap.getBounds().getMinY());
 				are.transform(at2);
 				are.transform(at);
@@ -303,7 +325,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				AffineTransform at = AffineTransform.getScaleInstance(1.0, -1.0);
 				at.translate(0, -are.getBounds().getHeight());
 				g4.drawImage(imgintmp, at, this);
-				
+
 				AffineTransform at2 = AffineTransform.getTranslateInstance(-shap.getBounds().getMinX(), -shap.getBounds().getMinY());
 				are.transform(at2);
 				are.transform(at);
@@ -342,7 +364,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		PaintTool.shx = 0;
 		PaintTool.shy = 0;
 	}
-	
+
 	int pointrx(Shape sh,double rote){
 		Area are = new Area(sh);
 		AffineTransform tran = new AffineTransform();
@@ -353,7 +375,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		are.transform(tran);
 		return are.getBounds().x;
 	}
-	
+
 	int pointry(Shape sh,double rote){
 		Area are = new Area(sh);
 		AffineTransform tran = new AffineTransform();
@@ -372,7 +394,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 	int pointrotatey(int x,int y,double rote,int rotex, int rotey){
 		return rotey+(int)Math.round((x-rotex)*Math.sin(rote) + (y-rotey)*Math.cos(rote));
 	}
-	
+
 	void UndoLeave(){
 		if(imgnum == start2img  && imgnum != startimg){//開放処理
 			try {
@@ -408,7 +430,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 	}
-	
+
 	void RedoLeave(){
 		if(imgnum == end2img  && imgnum != endimg){//開放処理
 			try {
@@ -445,7 +467,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 	}
-	
+
 	CycleMethod getGradientPattern(){
 		if(ToolPanel.rb8.isSelected()){
 			return MultipleGradientPaint.CycleMethod.NO_CYCLE;
@@ -455,7 +477,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			return MultipleGradientPaint.CycleMethod.REPEAT;
 		}
 	}
-	
+
 	void setColor(Graphics2D g){
 		if(FillFrame.r1.isSelected() || FillFrame.img == null){
 			g.setColor(PaintTool.getColor());
@@ -463,11 +485,11 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			g.setPaint(new TexturePaint(FillFrame.imgscal, new Rectangle2D.Double(x1, y1, FillFrame.imgscal.getWidth(), FillFrame.imgscal.getHeight())));
 		}
 	}
-		
+
 	void setStroke(Graphics2D g){
 		float[] pattern = PaintTool.p15.getpattern();
 		int size;
-		switch(PaintTool.getType()){
+		switch(PaintTool.type){
 		case 0:
 			size = PaintTool.getsize();
 			break;
@@ -505,14 +527,14 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			size = PaintTool.getsize();
 			break;
 		}
-		
+
 		if(pattern[0] == 0 && pattern.length == 1){
 			g.setStroke(new BasicStroke(size, PaintTool.p15.getborder(), BasicStroke.JOIN_MITER));
 		}else{
 			g.setStroke(new BasicStroke(size, PaintTool.p15.getborder(), BasicStroke.JOIN_MITER, 1.0f, pattern, 0.0f));
 		}
 	}
-	
+
 	//選択範囲形作成
 	void makeShap(){
 		int r1, gr1, b1;
@@ -1324,7 +1346,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 	}
-	
+
 	/* ★★コンストラクタ★★ */
 	DrawPanel() {
 		super();
@@ -1372,7 +1394,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 		g3.drawLine((int)Math.round(PaintTool.sizex*PaintTool.scale), 0, (int)Math.round(PaintTool.sizex*PaintTool.scale), (int)Math.round(PaintTool.sizey*PaintTool.scale));
 		g3.drawLine(0, (int)Math.round(PaintTool.sizey*PaintTool.scale), (int)Math.round(PaintTool.sizex*PaintTool.scale), (int)Math.round(PaintTool.sizey*PaintTool.scale));
 		g3.scale(PaintTool.scale, PaintTool.scale);
-		if(PaintTool.getType() == 20){
+		if(PaintTool.type == 20){
 			if (PaintTool.getComand() != 0 && PaintTool.getComand() != 15) {
 				pcnt2 = 0;
 				curvex = -1000;
@@ -1675,8 +1697,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			g3.drawImage(img[imgnum], 0, 0, this);
 		} else {
 			if (capt) { // img移行処理
-				if(set && (PaintTool.getType() != 12 || PaintTool.getComand() == 13 || listname.equals("選択範囲白塗") || listname.equals("選択範囲白塗＆変形") || listname.equals("選択範囲変形"))){
-					if(PaintTool.getType() != 12)capture();
+				if(set && (PaintTool.type != 12 || PaintTool.getComand() == 13 || listname.equals("選択範囲白塗") || listname.equals("選択範囲白塗＆変形") || listname.equals("選択範囲変形"))){
+					if(PaintTool.type != 12)capture();
 					try {
 						File file = new File(tmpname + "in" + imgnum + ".bmp");
 						ImageIO.write(imgin, "bmp", file);
@@ -1775,7 +1797,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					g2.clip(maskare2);
 				}
 			}
-			
+
 			g2.setColor(PaintTool.getColor());// 色設定
 			setColor(g2);
 			if (debug || clock) {
@@ -1796,7 +1818,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				PaintTool.ratioy = 100;
 				PaintTool.shx = 0;
 				PaintTool.shy = 0;
-				if(PaintTool.getType() == 20){
+				if(PaintTool.type == 20){
 					pcnt2 = 0;
 					curvex = -1000;
 					curvey = -1000;
@@ -1977,7 +1999,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 								if(PaintTool.colornum < 23){
 									g3.setColor(new Color(PaintTool.color[PaintTool.colornum].getRed() + Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getRed() - PaintTool.color[PaintTool.colornum].getRed())),PaintTool.color[PaintTool.colornum].getGreen() + Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getGreen() - PaintTool.color[PaintTool.colornum].getGreen())),PaintTool.color[PaintTool.colornum].getBlue()+ Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getBlue() - PaintTool.color[PaintTool.colornum].getBlue()))));
 								}
-								
+
 							}
 							g3.drawRect((x1 < x2) ? x1 + Math.abs(x1 - x2) * i
 									/ PaintTool.getsize2() / 2 : x2
@@ -2004,7 +2026,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 									g3.setColor(new Color(PaintTool.color[PaintTool.colornum].getRed() + Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getRed() - PaintTool.color[PaintTool.colornum].getRed())),PaintTool.color[PaintTool.colornum].getGreen() + Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getGreen() - PaintTool.color[PaintTool.colornum].getGreen())),PaintTool.color[PaintTool.colornum].getBlue()+ Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getBlue() - PaintTool.color[PaintTool.colornum].getBlue()))));
 								}
 							}
-							g3.drawRect(x11 + w * i/ PaintTool.getsize2() / 2 
+							g3.drawRect(x11 + w * i/ PaintTool.getsize2() / 2
 									, y11 + h * i/ PaintTool.getsize2() / 2
 									, w * (PaintTool.getsize2() - i)/ PaintTool.getsize2()
 									, h * (PaintTool.getsize2() - i)/ PaintTool.getsize2());
@@ -2049,7 +2071,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 									if(PaintTool.colornum < 23){
 										g2.setColor(new Color(PaintTool.color[PaintTool.colornum].getRed() + Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getRed() - PaintTool.color[PaintTool.colornum].getRed())),PaintTool.color[PaintTool.colornum].getGreen() + Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getGreen() - PaintTool.color[PaintTool.colornum].getGreen())),PaintTool.color[PaintTool.colornum].getBlue()+ Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getBlue() - PaintTool.color[PaintTool.colornum].getBlue()))));
 									}
-								}g2.drawRect(x11 + w * i/ PaintTool.getsize2() / 2 
+								}g2.drawRect(x11 + w * i/ PaintTool.getsize2() / 2
 										, y11 + h * i/ PaintTool.getsize2() / 2
 										, w * (PaintTool.getsize2() - i)/ PaintTool.getsize2()
 										, h * (PaintTool.getsize2() - i)/ PaintTool.getsize2());
@@ -2127,7 +2149,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 						}else{
 							g2.fillRect(x11, y11, w, h);
 						}
-						
+
 						g2.rotate(PaintTool.getsize3()*Math.PI/180, x1, y1);
 						g2.setClip(null);
 					}
@@ -2187,8 +2209,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 									g3.setColor(new Color(PaintTool.color[PaintTool.colornum].getRed() + Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getRed() - PaintTool.color[PaintTool.colornum].getRed())),PaintTool.color[PaintTool.colornum].getGreen() + Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getGreen() - PaintTool.color[PaintTool.colornum].getGreen())),PaintTool.color[PaintTool.colornum].getBlue()+ Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getBlue() - PaintTool.color[PaintTool.colornum].getBlue()))));
 								}
 							}
-							g3.drawOval(x11 + w * i/ PaintTool.getsize2() / 2 
-									, y11 + h * i/ PaintTool.getsize2() / 2 
+							g3.drawOval(x11 + w * i/ PaintTool.getsize2() / 2
+									, y11 + h * i/ PaintTool.getsize2() / 2
 									, w* (PaintTool.getsize2() - i)/ PaintTool.getsize2(),
 									h* (PaintTool.getsize2() - i)/ PaintTool.getsize2());
 						}
@@ -2235,8 +2257,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 										g2.setColor(new Color(PaintTool.color[PaintTool.colornum].getRed() + Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getRed() - PaintTool.color[PaintTool.colornum].getRed())),PaintTool.color[PaintTool.colornum].getGreen() + Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getGreen() - PaintTool.color[PaintTool.colornum].getGreen())),PaintTool.color[PaintTool.colornum].getBlue()+ Math.round(((float)i/PaintTool.getsize())*(PaintTool.color[PaintTool.colornum+1].getBlue() - PaintTool.color[PaintTool.colornum].getBlue()))));
 									}
 								}
-								g2.drawOval(x11 + w * i/ PaintTool.getsize2() / 2 
-										, y11 + h * i/ PaintTool.getsize2() / 2 
+								g2.drawOval(x11 + w * i/ PaintTool.getsize2() / 2
+										, y11 + h * i/ PaintTool.getsize2() / 2
 										, w* (PaintTool.getsize2() - i)/ PaintTool.getsize2(),
 										h* (PaintTool.getsize2() - i)/ PaintTool.getsize2());
 							}
@@ -2317,8 +2339,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 						g4.fillOval(x11, y11, w, h);
 						g4.setClip(null);
 						for (int i = 0; i <= PaintTool.getsize(); i++) {
-							g3.drawOval(x11 + w * i/ PaintTool.getsize2() / 2 
-									, y11 + h * i/ PaintTool.getsize2() / 2 
+							g3.drawOval(x11 + w * i/ PaintTool.getsize2() / 2
+									, y11 + h * i/ PaintTool.getsize2() / 2
 									, w* (PaintTool.getsize2() - i)/ PaintTool.getsize2(),
 									h* (PaintTool.getsize2() - i)/ PaintTool.getsize2());
 						}
@@ -2365,8 +2387,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 							g4.fillOval(x11, y11, w, h);
 							g4.setClip(null);
 							for (int i = 0; i <= PaintTool.getsize(); i++) {
-								g3.drawOval(x11 + w * i/ PaintTool.getsize2() / 2 
-										, y11 + h * i/ PaintTool.getsize2() / 2 
+								g3.drawOval(x11 + w * i/ PaintTool.getsize2() / 2
+										, y11 + h * i/ PaintTool.getsize2() / 2
 										, w* (PaintTool.getsize2() - i)/ PaintTool.getsize2(),
 										h* (PaintTool.getsize2() - i)/ PaintTool.getsize2());
 							}
@@ -2677,7 +2699,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 						if(MoziFrame.rb5.isSelected())g3.setColor(PaintTool.color[1]);
 						if(MoziFrame.rb6.isSelected())g3.setColor(PaintTool.color[2]);
 						g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()/3));
-						g3.drawString(PaintTool.getMozi(), x1 - rectText.width/2 + PaintTool.getMozisize()*1/25*dx[MoziFrame.cb2.getSelectedIndex()], 
+						g3.drawString(PaintTool.getMozi(), x1 - rectText.width/2 + PaintTool.getMozisize()*1/25*dx[MoziFrame.cb2.getSelectedIndex()],
 								y1 - rectText.height/2+fm.getMaxAscent() + PaintTool.getMozisize()*1/25*dy[MoziFrame.cb2.getSelectedIndex()]);
 					}
 					g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
@@ -2760,14 +2782,15 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 							} catch (Exception d) {
 							}
 						}
-						
+
 						Area are = new Area(shap);
 						AffineTransform tran = new AffineTransform();
 						tran.translate((shap.getBounds().x - (x1-x2) + (int)PaintTool.shx*(ssety1-sety1)+ (int)PaintTool.shx*(y1-y2))*100/PaintTool.ratiox - shap.getBounds().x ,  (shap.getBounds().y - (y1-y2) + (int)PaintTool.shy*(ssetx1-setx1)+ (int)PaintTool.shy*(x1-x2))*100/PaintTool.ratioy - shap.getBounds().y);
 						are.transform(tran);
 						g3.setClip(are);
 						if(!(SelectOptionFrame.rb7.isSelected())){
-							g3.drawImage(imgin,pointrotatex((shap.getBounds().x - (x1-x2) + (int)PaintTool.shx*(ssety1-sety1)+ (int)PaintTool.shx*(y1-y2))*100/PaintTool.ratiox, (shap.getBounds().y - (y1-y2) + (int)PaintTool.shy*(ssetx1-setx1)+ (int)PaintTool.shy*(x1-x2))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), pointrotatey((shap.getBounds().x - (x1-x2) + (int)PaintTool.shx*(ssety1-sety1)+ (int)PaintTool.shx*(y1-y2))*100/PaintTool.ratiox, (shap.getBounds().y - (y1-y2) + (int)PaintTool.shy*(ssetx1-setx1)+ (int)PaintTool.shy*(x1-x2))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), this);
+							blendImage(g3, are);
+							//g3.drawImage(imgin,pointrotatex((shap.getBounds().x - (x1-x2) + (int)PaintTool.shx*(ssety1-sety1)+ (int)PaintTool.shx*(y1-y2))*100/PaintTool.ratiox, (shap.getBounds().y - (y1-y2) + (int)PaintTool.shy*(ssetx1-setx1)+ (int)PaintTool.shy*(x1-x2))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), pointrotatey((shap.getBounds().x - (x1-x2) + (int)PaintTool.shx*(ssety1-sety1)+ (int)PaintTool.shx*(y1-y2))*100/PaintTool.ratiox, (shap.getBounds().y - (y1-y2) + (int)PaintTool.shy*(ssetx1-setx1)+ (int)PaintTool.shy*(x1-x2))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), this);
 						}
 						g3.setClip(null);
 						g3.setColor(Color.red);
@@ -2791,7 +2814,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 						Area are = new Area(shap);
 						g3.setClip(are);
 						if(!(SelectOptionFrame.rb7.isSelected())){
-							g3.drawImage(imgin,pointrotatex((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), pointrotatey((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), this);
+							blendImage(g3, are);
+							//g3.drawImage(imgin,pointrotatex((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), pointrotatey((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), this);
 						}
 						g3.setClip(null);
 						g3.setColor(Color.red);
@@ -2813,7 +2837,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 							g3.setClip(are);
 							g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, SelectOptionFrame.gettrans()));
 							if(!(SelectOptionFrame.rb7.isSelected())){
-								g3.drawImage(imgin,pointrotatex((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), pointrotatey((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), this);
+								blendImage(g3, are);
+								//g3.drawImage(imgin,pointrotatex((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), pointrotatey((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), this);
 							}
 							g3.setClip(null);
 							g3.setColor(Color.RED);
@@ -2843,6 +2868,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 							g3.setClip(are);
 							g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, SelectOptionFrame.gettrans()));
 							if(!(SelectOptionFrame.rb7.isSelected())){
+								//blendImage(g3, are);
 								g3.drawImage(imgin,pointrotatex((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), pointrotatey((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), this);
 							}
 							g3.setClip(null);
@@ -3064,7 +3090,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 						Area are = new Area(shap);
 						g3.setClip(are);
 						if(!(SelectOptionFrame.rb7.isSelected())){
-							g3.drawImage(imgin,pointrotatex((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), pointrotatey((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), this);
+							blendImage(g3, are);
+							//g3.drawImage(imgin,pointrotatex((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), pointrotatey((shap.getBounds().x + (int)PaintTool.shx*(ssety1-sety1))*100/PaintTool.ratiox, (shap.getBounds().y + (int)PaintTool.shy*(ssetx1-setx1))*100/PaintTool.ratioy,PaintTool.spin*Math.PI/180, rotatex2, rotatey2), this);
 						}
 						g3.setClip(null);
 						g3.setColor(Color.RED);
@@ -3202,14 +3229,14 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					if(PaintTool.getComand() == 12){//全体
 						imgtemp = new BufferedImage(PaintTool.sizex + 4, PaintTool.sizey + 4, BufferedImage.TYPE_INT_RGB);
 						imgtemp2 = new BufferedImage(PaintTool.sizex + 4, PaintTool.sizey + 4, BufferedImage.TYPE_INT_RGB);
-						
+
 						BufferedImage imgt = new BufferedImage(PaintTool.sizex + 4, PaintTool.sizey + 4, BufferedImage.TYPE_INT_RGB);;
 						Graphics2D g5 = (Graphics2D) imgt.getGraphics();
 						g5.scale(1.04,1.04);
 						g5.drawImage(img[imgnum], 2-(int)Math.ceil((float)img[imgnum].getWidth()/50), 2-(int)Math.ceil((float)img[imgnum].getHeight()/50), this);
 						g5.scale((float)1/1.04,(float)1/1.04);
 						g5.drawImage(img[imgnum], 2, 2, this);
-						
+
 						Area are = new Area(new Rectangle(0, 0, PaintTool.sizex ,PaintTool.sizey));
 						if((SelectOptionFrame.rb3.isSelected())){
 							are.subtract(maskare2);
@@ -3217,7 +3244,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 							are.subtract(maskare);
 						}
 						g2.clip(are);
-						
+
 						if(ToolPanel.cbf.getSelectedItem() == "ネガポジ"){
 							imgtemp2 = negaposi(imgt);
 						}else if(ToolPanel.cbf.getSelectedItem() == "モノクロ"){
@@ -3241,7 +3268,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 								f8 = 1f / 9f;
 								f9 = 1f / 9f;
 								f10 = 1f / 9f;
-								
+
 							}else if(ToolPanel.cbf.getSelectedItem() == "シャープtype1"){
 								f0 = -0.1f;
 								f1 = -0.1f;
@@ -3254,8 +3281,8 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 								f8 = -0.3f;
 								f9 = -0.3f;
 								f10 = -0.3f;
-								
-								
+
+
 							}else if(ToolPanel.cbf.getSelectedItem() == "シャープtype2"){
 								f0 = 0f;
 								f1 = 0f;
@@ -3397,7 +3424,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 						g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, PaintTool.getsize5()));
 						g2.drawImage(imgtemp2, -2, -2, this);
-						
+
 						if((SelectOptionFrame.rb3.isSelected())){
 							g2.clip(maskare);
 						} else if((SelectOptionFrame.rb4.isSelected())){
@@ -3427,14 +3454,14 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 							aretmp = new Area();
 							imgtemp = new BufferedImage(PaintTool.sizex + 4, PaintTool.sizey + 4, BufferedImage.TYPE_INT_RGB);
 							imgtemp2 = new BufferedImage(PaintTool.sizex + 4, PaintTool.sizey + 4, BufferedImage.TYPE_INT_RGB);
-							
+
 							BufferedImage imgt = new BufferedImage(PaintTool.sizex + 4, PaintTool.sizey + 4, BufferedImage.TYPE_INT_RGB);;
 							Graphics2D g5 = (Graphics2D) imgt.getGraphics();
 							g5.scale(1.04,1.04);
 							g5.drawImage(img[imgnum], 2-(int)Math.ceil((float)img[imgnum].getWidth()/50), 2-(int)Math.ceil((float)img[imgnum].getHeight()/50), this);
 							g5.scale((float)1/1.04,(float)1/1.04);
 							g5.drawImage(img[imgnum], 2, 2, this);
-							
+
 							if(ToolPanel.cbf.getSelectedItem() == "ネガポジ"){
 								imgtemp2 = negaposi(imgt);
 							}else if(ToolPanel.cbf.getSelectedItem() == "モノクロ"){
@@ -3853,9 +3880,18 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 							}
 							g3.setPaint(gradient);
 							g3.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
+							if (centerx != -1 || centery != -1){
+								g3.setColor(PaintTool.color[PaintTool.colornum]);
+								g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
+								g3.drawOval(centerx-1, centery-1, 2, 2);
+							}
 						}
 					}else{//始点設定
-						g3.drawOval(centerx-1, centery-1, 2, 2);
+						if (centerx != -1 || centery != -1){
+							g3.setColor(PaintTool.color[PaintTool.colornum]);
+							g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
+							g3.drawOval(centerx-1, centery-1, 2, 2);
+						}
 					}
 				} else {
 					if(regular){
@@ -3885,10 +3921,11 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 								}else{
 									gradient = new RadialGradientPaint(x1, y1, (float)Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)), centerx, centery, dist, colors, getGradientPattern());
 								}
-							g2.setPaint(gradient);
+								g2.setPaint(gradient);
 								g2.fill(new Rectangle2D.Double(0, 0, PaintTool.sizex, PaintTool.sizey));
 							}
 						}else{//始点設定
+							g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
 							g3.drawOval(centerx-1, centery-1, 2, 2);
 						}
 					}
@@ -4646,75 +4683,92 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					r1 = (img[imgnum].getRGB(x1, y1) / 256 / 256) - 1 & 0xff;
 					if (b1 == 0 && gr1 == 0)
 						r1 = (r1 + 1) % 256;
-					boolean[][] map;
-					map = new boolean[PaintTool.sizex][PaintTool.sizey];
-					map[x1][y1] = true;
-					g2.drawLine(x1, y1, x1, y1);
-					LinkedList<int[]> array = new LinkedList<int[]>();
-					array.offer(new int[]{x1, y1});
-					int[] w = new int[2];
-					while((w = array.poll()) != null){//map作成
-						if(w[0]+1 < PaintTool.sizex){
-							if(map[w[0]+1][w[1]] == false){
-								int r, gr, b;
-								b = img[imgnum].getRGB(w[0]+1, w[1]) & 0xff;
-								gr = (img[imgnum].getRGB(w[0]+1, w[1]) / 256) - 1 & 0xff;
-								if (b == 0) gr = (gr + 1) % 256;
-								r = (img[imgnum].getRGB(w[0]+1, w[1]) / 256 / 256) - 1 & 0xff;
-								if (b == 0 && gr == 0) r = (r + 1) % 256;
-								if((Math.abs(r1-r) + Math.abs(gr1-gr) + Math.abs(b1-b)) <= PaintTool.getsize2f()){
-									map[w[0]+1][w[1]] = true;
-									array.offer(new int[]{w[0]+1, w[1]});
-									g2.drawLine(w[0]+1, w[1], w[0]+1, w[1]);
+					if(!ToolPanel.cb2.isSelected()){//通常の塗りつぶし
+						boolean[][] map;
+						map = new boolean[PaintTool.sizex][PaintTool.sizey];
+						map[x1][y1] = true;
+						g2.drawLine(x1, y1, x1, y1);
+						LinkedList<int[]> array = new LinkedList<int[]>();
+						array.offer(new int[]{x1, y1});
+						int[] w = new int[2];
+						while((w = array.poll()) != null){//map作成
+							if(w[0]+1 < PaintTool.sizex){
+								if(map[w[0]+1][w[1]] == false){
+									int r, gr, b;
+									b = img[imgnum].getRGB(w[0]+1, w[1]) & 0xff;
+									gr = (img[imgnum].getRGB(w[0]+1, w[1]) / 256) - 1 & 0xff;
+									if (b == 0) gr = (gr + 1) % 256;
+									r = (img[imgnum].getRGB(w[0]+1, w[1]) / 256 / 256) - 1 & 0xff;
+									if (b == 0 && gr == 0) r = (r + 1) % 256;
+									if((Math.abs(r1-r) + Math.abs(gr1-gr) + Math.abs(b1-b)) <= PaintTool.getsize2f()){
+										map[w[0]+1][w[1]] = true;
+										array.offer(new int[]{w[0]+1, w[1]});
+										g2.drawLine(w[0]+1, w[1], w[0]+1, w[1]);
+									}
+								}
+							}
+							if(w[0]-1 >= 0){
+								if(map[w[0]-1][w[1]] == false){
+									int r, gr, b;
+									b = img[imgnum].getRGB(w[0]-1, w[1]) & 0xff;
+									gr = (img[imgnum].getRGB(w[0]-1, w[1]) / 256) - 1 & 0xff;
+									if (b == 0) gr = (gr + 1) % 256;
+									r = (img[imgnum].getRGB(w[0]-1, w[1]) / 256 / 256) - 1 & 0xff;
+									if (b == 0 && gr == 0) r = (r + 1) % 256;
+									if((Math.abs(r1-r) + Math.abs(gr1-gr) + Math.abs(b1-b)) <= PaintTool.getsize2f()){
+										map[w[0]-1][w[1]] = true;
+										array.offer(new int[]{w[0]-1, w[1]});
+										g2.drawLine(w[0]-1, w[1], w[0]-1, w[1]);
+									}
+								}
+							}
+							if(w[1]+1 < PaintTool.sizey){
+								if(map[w[0]][w[1]+1] == false){
+									int r, gr, b;
+									b = img[imgnum].getRGB(w[0], w[1]+1) & 0xff;
+									gr = (img[imgnum].getRGB(w[0], w[1]+1) / 256) - 1 & 0xff;
+									if (b == 0) gr = (gr + 1) % 256;
+									r = (img[imgnum].getRGB(w[0], w[1]+1) / 256 / 256) - 1 & 0xff;
+									if (b == 0 && gr == 0) r = (r + 1) % 256;
+									if((Math.abs(r1-r) + Math.abs(gr1-gr) + Math.abs(b1-b)) <= PaintTool.getsize2f()){
+										map[w[0]][w[1]+1] = true;
+										array.offer(new int[]{w[0], w[1]+1});
+										g2.drawLine(w[0], w[1]+1, w[0], w[1]+1);
+									}
+								}
+							}
+							if(w[1]-1 >= 0){
+								if(map[w[0]][w[1]-1] == false){
+									int r, gr, b;
+									b = img[imgnum].getRGB(w[0], w[1]-1) & 0xff;
+									gr = (img[imgnum].getRGB(w[0], w[1]-1) / 256) - 1 & 0xff;
+									if (b == 0) gr = (gr + 1) % 256;
+									r = (img[imgnum].getRGB(w[0], w[1]-1) / 256 / 256) - 1 & 0xff;
+									if (b == 0 && gr == 0) r = (r + 1) % 256;
+									if((Math.abs(r1-r) + Math.abs(gr1-gr) + Math.abs(b1-b)) <= PaintTool.getsize2f()){
+										map[w[0]][w[1]-1] = true;
+										array.offer(new int[]{w[0], w[1]-1});
+										g2.drawLine(w[0], w[1]-1, w[0], w[1]-1);
+									}
 								}
 							}
 						}
-						if(w[0]-1 >= 0){
-							if(map[w[0]-1][w[1]] == false){
+					}else{//同職全体塗り
+						for(int i = 0;i < PaintTool.sizex;i++){
+							for(int j = 0;j < PaintTool.sizey;j++){
 								int r, gr, b;
-								b = img[imgnum].getRGB(w[0]-1, w[1]) & 0xff;
-								gr = (img[imgnum].getRGB(w[0]-1, w[1]) / 256) - 1 & 0xff;
+								b = img[imgnum].getRGB(i, j) & 0xff;
+								gr = (img[imgnum].getRGB(i, j) / 256) - 1 & 0xff;
 								if (b == 0) gr = (gr + 1) % 256;
-								r = (img[imgnum].getRGB(w[0]-1, w[1]) / 256 / 256) - 1 & 0xff;
+								r = (img[imgnum].getRGB(i, j) / 256 / 256) - 1 & 0xff;
 								if (b == 0 && gr == 0) r = (r + 1) % 256;
 								if((Math.abs(r1-r) + Math.abs(gr1-gr) + Math.abs(b1-b)) <= PaintTool.getsize2f()){
-									map[w[0]-1][w[1]] = true;
-									array.offer(new int[]{w[0]-1, w[1]});
-									g2.drawLine(w[0]-1, w[1], w[0]-1, w[1]);
-								}
-							}
-						}
-						if(w[1]+1 < PaintTool.sizey){
-							if(map[w[0]][w[1]+1] == false){
-								int r, gr, b;
-								b = img[imgnum].getRGB(w[0], w[1]+1) & 0xff;
-								gr = (img[imgnum].getRGB(w[0], w[1]+1) / 256) - 1 & 0xff;
-								if (b == 0) gr = (gr + 1) % 256;
-								r = (img[imgnum].getRGB(w[0], w[1]+1) / 256 / 256) - 1 & 0xff;
-								if (b == 0 && gr == 0) r = (r + 1) % 256;
-								if((Math.abs(r1-r) + Math.abs(gr1-gr) + Math.abs(b1-b)) <= PaintTool.getsize2f()){
-									map[w[0]][w[1]+1] = true;
-									array.offer(new int[]{w[0], w[1]+1});
-									g2.drawLine(w[0], w[1]+1, w[0], w[1]+1);
-								}
-							}
-						}
-						if(w[1]-1 >= 0){
-							if(map[w[0]][w[1]-1] == false){
-								int r, gr, b;
-								b = img[imgnum].getRGB(w[0], w[1]-1) & 0xff;
-								gr = (img[imgnum].getRGB(w[0], w[1]-1) / 256) - 1 & 0xff;
-								if (b == 0) gr = (gr + 1) % 256;
-								r = (img[imgnum].getRGB(w[0], w[1]-1) / 256 / 256) - 1 & 0xff;
-								if (b == 0 && gr == 0) r = (r + 1) % 256;
-								if((Math.abs(r1-r) + Math.abs(gr1-gr) + Math.abs(b1-b)) <= PaintTool.getsize2f()){
-									map[w[0]][w[1]-1] = true;
-									array.offer(new int[]{w[0], w[1]-1});
-									g2.drawLine(w[0], w[1]-1, w[0], w[1]-1);
+									g2.drawLine(i, j, i, j);
 								}
 							}
 						}
 					}
+
 				}
 			}
 			if ((PaintTool.type >= 0 && PaintTool.type <= 4 || PaintTool.type == 17 || PaintTool.type == 18) && debug == true || (PaintTool.type == 6 || PaintTool.type == 7) && debug == false) {
@@ -4791,7 +4845,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			g3.draw((Shape)are1);
 			g3.scale(1, 1);
 		}
-		
+
 		if(listname.equals("選択範囲作成") || listname.equals("選択範囲変更") || listname.equals("選択範囲反転")){
 			timer2.schedule(new TimerTask() {; public void run() {
 				repaint();
@@ -4805,7 +4859,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			ComandPanel.tmpx = 0;
 			ComandPanel.tmpy = 0;
 		}
-		
+
 		if(RulerFrame.cb.isSelected()){//グリッド線表示
 			g3.setColor(Color.black);
 			g3.setStroke(new BasicStroke(1.0f));
@@ -4817,7 +4871,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				g3.drawLine(0, Math.round(i), (int)Math.round(PaintTool.sizex*PaintTool.scale), Math.round(i));
 			}
 			g3.scale(PaintTool.scale, PaintTool.scale);
-			
+
 		}
 		PaintTool.copym.setEnabled(set);
 		ToolPanel.b1.setEnabled(set);
@@ -4843,7 +4897,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 			press = true;
 			x1 = (int)(((double)e.getX())/PaintTool.scale);
 			y1 = (int)(((double)e.getY())/PaintTool.scale);
-			
+
 			if (PaintTool.type <= 4 || PaintTool.type == 17 || PaintTool.type == 18) {
 				PaintTool.p5.l8.setText("w");
 				PaintTool.p5.l9.setText("0");
@@ -5117,20 +5171,22 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 					repaint();
 			}else if(PaintTool.type == 17){
 				if(ToolPanel.rb1.isSelected()){
-					PaintTool.drawcation(true);
-					Timer timer = new Timer();
-					timer.schedule(new TimerTask() {public void run() {
-						capt = true;
-						listname = "グラデーション";
-						debug = false;
-						regular = true;
-						PaintTool.p5.l8.setText("");
-						PaintTool.p5.l9.setText("");
-						PaintTool.p5.l10.setText("");
-						PaintTool.p5.l11.setText("");
-						PaintTool.rewrite();
-					}}
-					, 1);
+					if(x1 != x2 || y1 != y2){
+						PaintTool.drawcation(true);
+						Timer timer = new Timer();
+						timer.schedule(new TimerTask() {public void run() {
+							capt = true;
+							listname = "グラデーション";
+							debug = false;
+							regular = true;
+							PaintTool.p5.l8.setText("");
+							PaintTool.p5.l9.setText("");
+							PaintTool.p5.l10.setText("");
+							PaintTool.p5.l11.setText("");
+							PaintTool.rewrite();
+						}}
+						, 1);
+					}
 				}else{
 					centerx = x2;
 					centery = y2;
@@ -5383,7 +5439,7 @@ public class DrawPanel extends JPanel implements MouseListener, MouseMotionListe
 				if(ToolPanel.rb1.isSelected()){
 					x2 = (int)(((double)e.getX())/PaintTool.scale);
 					y2 = (int)(((double)e.getY())/PaintTool.scale);
-					
+
 				}else{
 					centerx = (int)(((double)e.getX())/PaintTool.scale);
 					centery = (int)(((double)e.getY())/PaintTool.scale);

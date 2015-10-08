@@ -56,10 +56,10 @@ import javax.swing.KeyStroke;
 
 class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemListener{
 	private static final long serialVersionUID = 2L;
-	
+
 	public static int HistoryNUM = 200;
 	public static int Heepsize = 170000000;
-	
+
 	public static int type = 0, selectframetype = 0, comand = 0, colornum = 0,
 			sizex = 500, sizey = 500, spin = 0, ratiox = 100, ratioy = 100, moveindex;
 	public static float shx = 0, shy = 0;
@@ -111,10 +111,6 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		type = a;
 	}
 
-	static int getType() {
-		return type;
-	}
-
 	static int getsize() {
 		return p1.getsize();
 	}
@@ -138,7 +134,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 	static float getsize5() {
 		return p1.getsize5();
 	}
-	
+
 	static int getsize6() {
 		return p1.getsize6();
 	}
@@ -152,7 +148,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		p7.setLocation(PaintTool.scrollpane.getLocationOnScreen().x + PaintTool.scrollpane.getWidth()/2 - 230, PaintTool.scrollpane.getLocationOnScreen().y +PaintTool.scrollpane.getHeight()/2 - 100);
 		p7.visible();
 	}
-	
+
 	static void ChangeSize() {
 		p7.t1.setText(String.valueOf(sizex));
 		p7.t2.setText(String.valueOf(sizey));
@@ -188,8 +184,8 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		p3.regular = true;
 		p3.rewrite();
 	}
-	
-	
+
+
 	static void changeShape() {
 		if (!(p1.getsize3() == spin && ratiox == p1.getsize()
 				&& ratioy == p1.getsize2() && ((shx == p1.getsize4f() && ToolPanel.rb2
@@ -213,7 +209,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 			p3.selectRectDraw();
 		}
 	}
-	
+
 	public static void AreaHanten() {
 		if (DrawPanel.set == true) {
 			p3.selectRectDraw();
@@ -221,7 +217,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 			p3.rewrite();
 		}
 	}
-	
+
 	static void deside() {
 		comand = 15;
 		DrawPanel.capt = true;
@@ -345,16 +341,16 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 	static void optionInvisible() {
 		p9.invisible();
 	}
-	
+
 	static void viewVisible() {
 		p11.repaint();
 		p11.frame.setVisible(true);
 	}
-	
+
 	static void viewInvisible() {
 		p11.frame.setVisible(false);
 	}
-	
+
 	static void toolVisible() {
 		p12.visible();
 	}
@@ -362,7 +358,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 	static void toolInvisible() {
 		p12.invisible();
 	}
-	
+
 	static void hsvVisible() {
 		p13.visible();
 	}
@@ -370,7 +366,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 	static void hsvInvisible() {
 		p13.invisible();
 	}
-	
+
 	static void rulerVisible() {
 		p14.visible();
 	}
@@ -378,7 +374,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 	static void rulerInvisible() {
 		p14.invisible();
 	}
-	
+
 	static void strokeVisible() {
 		p15.visible();
 	}
@@ -386,7 +382,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 	static void strokeInvisible() {
 		p15.invisible();
 	}
-	
+
 	static void fillVisible() {
 		p16.visible();
 	}
@@ -440,7 +436,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		}
 		popup.show(e.getComponent(), e.getX(), e.getY());
 	}
-	
+
 	static void openRect() {
 		spin = 0;
 		ratiox = 100;
@@ -491,11 +487,11 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		setSize(1240, 650);
 		Container c = getContentPane();
 		c.setLayout(new BorderLayout());
-		
+
 		sizex = 500;
 		sizey = 500;
 		scale = 1;
-		
+
 		p1 = new ToolPanel();
 		p2 = new ColorPanel();
 		p3 = new DrawPanel();
@@ -520,7 +516,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		p4.setAlwaysOnTop(true);
 		p7.setAlwaysOnTop(true);
 		p8.setAlwaysOnTop(true);
-		
+
 		c.setBackground(Color.white);
 		p6.setLayout(new GridLayout(2, 1));
 		p6.add(p5);
@@ -559,7 +555,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		color[21] = Color.white;
 		color[22] = Color.white;
 		color[23] = Color.white;
-		
+
 		p3.addMouseListener(p3);
 		p3.addMouseMotionListener(p3);
 
@@ -574,7 +570,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 				}
 				System.exit(0);
 			}
-			
+
 			public void windowActivated(WindowEvent e) {//アクティブ時
 				Clipboard clp = main.getToolkit().getSystemClipboard();
 				Transferable data = clp.getContents(main);
@@ -669,7 +665,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		hsvm = new JCheckBoxMenuItem("HSV色選択", false);
 		strokem = new JCheckBoxMenuItem("ストローク", false);
 		fillm = new JCheckBoxMenuItem("塗り潰し色", false);
-		
+
 		JMenuItem verm = new JMenuItem("バージョン情報");
 
 		//メニューアイテムの追加
@@ -716,7 +712,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		saveasm.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
 		savem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
 		closem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_DOWN_MASK + KeyEvent.ALT_DOWN_MASK));
-		
+
 		undom.addActionListener(this);
 		redom.addActionListener(this);
 		copym.addActionListener(this);
@@ -727,8 +723,8 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		copym.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK));
 		pastem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK));
 		changem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK));
-		
-		
+
+
 		historym.addActionListener(this);
 		selectm.addActionListener(this);
 		viewm.addActionListener(this);
@@ -745,8 +741,8 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 		rulerm.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK));
 		strokem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_DOWN_MASK));
 		fillm.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK));
-		
-		
+
+
 		verm.addActionListener(this);
 
 		bmpm.addItemListener(this);
@@ -922,7 +918,7 @@ class PaintTool extends JFrame implements ClipboardOwner, ActionListener, ItemLi
 							savem.setEnabled(true);
 							comand = 8;
 							p3.rewrite();
-							
+
 						} catch (Exception d) {
 							p3.rewrite();
 						}

@@ -23,8 +23,8 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 	public static JButton b1, b2, b4, b5, b6,b7, b8, b9;
 	ImageIcon i1, i2, i3;
 	public static JLabel il1, il2, il3;
-	public JComboBox cb, cbh;
-	public static JComboBox cbf;
+	public JComboBox<String> cb, cbh;
+	public static JComboBox<String> cbf;
 	public static JRadioButton rb1, rb2, rb3, rb4, rb5, rb6, rb7, rb8, rb9, rb10, rb11;
 	private ButtonGroup gr1, gr2, gr3,gr4;
 	public static JCheckBox cb1,cb2, cb3, cb4;
@@ -68,7 +68,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 			return 1;
 		}
 	}
-	
+
 	float getsize3f() {
 		try {
 			return Float.parseFloat(t3.getText());
@@ -111,7 +111,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 			return (float)1;
 		}
 	}
-	
+
 	int getsize6() {
 		try {
 			return Integer.parseInt(t6.getText());
@@ -120,7 +120,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 			return 1;
 		}
 	}
-	
+
 	float getsize6f() {
 		try {
 			return Float.parseFloat(t6.getText());
@@ -129,7 +129,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 			return (float)1;
 		}
 	}
-	
+
 	float getsize7f() {
 		try {
 			return Float.parseFloat(t7.getText());
@@ -138,7 +138,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 			return (float)1;
 		}
 	}
-	
+
 	float getsize8f() {
 		try {
 			return Float.parseFloat(t8.getText());
@@ -147,7 +147,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 			return (float)1;
 		}
 	}
-	
+
 
 	void setsize(String a) {
 		t1.setText(a);
@@ -162,7 +162,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 	}
 	/* ★★コンストラクタ★★ */
 	ToolPanel() {
-		cb = new JComboBox();
+		cb = new JComboBox<String>();
 		cb.setMaximumRowCount(10);
 		cb.addItem("直線");
 		cb.addItem("線");
@@ -188,15 +188,15 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 		cb.addItem("RGBフィルター");
 		cb.addItem("輝度");
 		cb.addItem("選択ツール");
-		
-		cbh = new JComboBox();
+
+		cbh = new JComboBox<String>();
 		cbh.addItem("左右反転");
 		cbh.addItem("上下反転");
 		cbh.addItem("回転");
 		cbh.addItem("拡大縮小");
 		cbh.addItem("傾き");
-		
-		cbf = new JComboBox();
+
+		cbf = new JComboBox<String>();
 		cbf.addItem("ぼかし");
 		cbf.addItem("シャープtype1");
 		cbf.addItem("シャープtype2");
@@ -211,7 +211,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 		cbf.addItem("エンボス(右上)");
 		cbf.addItem("エンボス(左下)");
 		cbf.addItem("ネガポジ");
-		
+
 		t1 = new JTextField("2",4);
 		t2 = new JTextField("",4);
 		t3 = new JTextField("",4);
@@ -220,8 +220,8 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 		t6 = new JTextField("1",4);
 		t7 = new JTextField("0",4);
 		t8 = new JTextField("0",4);
-		
-		
+
+
 		b1 = new JButton("トリミング");
 		b2 = new JButton("変形");
 		b4 = new JButton("絵取込");
@@ -229,7 +229,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 		b5 = new JButton("全体変換");
 
 		b6 = new JButton("範囲反転");
-		
+
 		b7 = new JButton("クリア");
 
 		b8 = new JButton("確定");
@@ -245,7 +245,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 		l7 = new JLabel("");
 		l8 = new JLabel("縁");
 		l9 = new JLabel("");
-		
+
 		i1 = new ImageIcon(getClass().getResource("ノマグラ.png"));
 		il1 = new JLabel(i1);
 		i2 = new ImageIcon(getClass().getResource("線グラ.png"));
@@ -255,29 +255,29 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 
 		rb1 = new JRadioButton("",true);
 		rb2 = new JRadioButton("");
-		
+
 		rb3 = new JRadioButton("move",true);
 		rb4 = new JRadioButton("add");
 		rb5 = new JRadioButton("remove");
 		rb10= new JRadioButton("subtract");
-		
+
 		rb6 = new JRadioButton("点1",true);
 		rb7 = new JRadioButton("点2");
-		
+
 		rb8 = new JRadioButton("Normal",true);
 		rb9 = new JRadioButton("REPEAT");
 		rb11 = new JRadioButton("REFLECT");
-		
+
 		cb1 = new JCheckBox("回転");
 		s = new JSlider(SwingConstants.HORIZONTAL, 1, 10000, 10000);
 		s2 = new JSlider(SwingConstants.HORIZONTAL, 1, 10000, 10000);
 		s3 = new JSlider(SwingConstants.HORIZONTAL, 100, 25500, 200);
-		
-		
+
+
 		cb2 = new JCheckBox("グラデーション");
 		cb3 = new JCheckBox("ｸﾞﾗﾃﾞｰｼｮﾝ塗り");
 		cb4 = new JCheckBox("ﾏｰﾌﾞﾙ塗り");
-		
+
 		gr1 = new ButtonGroup();
 		gr1.add(rb1);
 		gr1.add(rb2);
@@ -291,12 +291,12 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 		gr3 = new ButtonGroup();
 		gr3.add(rb6);
 		gr3.add(rb7);
-		
+
 		gr4 = new ButtonGroup();
 		gr4.add(rb8);
 		gr4.add(rb9);
 		gr4.add(rb11);
-		
+
 
 		add(l1);
 		add(cb);
@@ -354,7 +354,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 			b8.setEnabled(false);
 			b9.setEnabled(false);
 		}else if (e.getSource() == b9) { // １つ消す(Polygon)
-			if(PaintTool.getType() == 12 && SelectOptionFrame.rb9.isSelected() && DrawPanel.pcnt2 > 0){
+			if(PaintTool.type == 12 && SelectOptionFrame.rb9.isSelected() && DrawPanel.pcnt2 > 0){
 				DrawPanel.pcnt2--;
 				if(DrawPanel.pcnt2 == 0)b9.setEnabled(false);
 				PaintTool.rewrite();
@@ -368,7 +368,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 				PaintTool.rewrite();
 			}
 		}else if (e.getSource() == t2) {//バー調整
-			if(PaintTool.getType() == 15){
+			if(PaintTool.type == 15){
 				if(rb6.isSelected()){
 					s3.setValue(Math.round(100*Float.parseFloat(t2.getText())));
 					s3.revalidate();
@@ -376,18 +376,18 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 					s3.setValue(Math.round(-100*Float.parseFloat(t2.getText())));
 					s3.revalidate();
 				}
-			}else if(PaintTool.getType() == 21){
+			}else if(PaintTool.type == 21){
 				s2.setValue(Math.round(14*Integer.parseInt(t2.getText())));
 				s2.revalidate();
 			}
 		}else if (e.getSource() == rb1) {//type1
-			if(PaintTool.getType() == 15){
+			if(PaintTool.type == 15){
 				if(rb6.isSelected()){
 					s3.setMaximum(1500);
 					s3.setMinimum(100);
 					s3.setValue(200);
 					t2.setText(String.valueOf((float)s3.getValue()/100.0));
-					
+
 				}else{
 					s3.setMaximum(0);
 					s3.setMinimum(-100);
@@ -396,7 +396,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 				}
 			}
 		}else if (e.getSource() == rb2) {//type2
-			if(PaintTool.getType() == 15){
+			if(PaintTool.type == 15){
 				if(rb6.isSelected()){
 					s3.setMaximum(990);
 					s3.setMinimum(0);
@@ -410,25 +410,32 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 				}
 			}
 		}else if (e.getSource() == rb3) {//グラデ1
-			if(PaintTool.getType() == 17){
-				rb2.setEnabled(false);
+			if(PaintTool.type == 17){
+				remove(rb1);
+				remove(rb2);
+				repaint();
 				rb1.setSelected(true);
 				DrawPanel.centerx = -1;
 				DrawPanel.centery = -1;
 			}
 		}else if (e.getSource() == rb4) {//グラデ2
-			if(PaintTool.getType() == 17){
-				rb2.setEnabled(false);
+			if(PaintTool.type == 17){
+				remove(rb1);
+				remove(rb2);
+				repaint();
 				rb1.setSelected(true);
 				DrawPanel.centerx = -1;
 				DrawPanel.centery = -1;
 			}
 		}else if (e.getSource() == rb5) {//グラデ3
-			if(PaintTool.getType() == 17){
-				rb2.setEnabled(true);
+			if(PaintTool.type == 17){
+				add(rb1);
+				add(rb2);
+				repaint();
+				revalidate();
 			}
 		}else if (e.getSource() == rb6) {//明るく
-			if(PaintTool.getType() == 15){
+			if(PaintTool.type == 15){
 				if(rb1.isSelected()){
 					s3.setMaximum(1500);
 					s3.setMinimum(100);
@@ -441,7 +448,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 				t2.setText(String.valueOf((float)s3.getValue()/100.0));
 			}
 		}else if (e.getSource() == rb7) {//暗く
-			if(PaintTool.getType() == 15){
+			if(PaintTool.type == 15){
 				if(rb1.isSelected()){
 					s3.setMaximum(0);
 					s3.setMinimum(-100);
@@ -484,7 +491,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 				t5.setText(String.valueOf(s.getValue()));
 			}
 		}else{
-			switch(PaintTool.getType()){
+			switch(PaintTool.type){
 			case 0:
 				size = Integer.parseInt(t1.getText());
 				break;
@@ -697,7 +704,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 					add(b6);
 					add(cbh);
 					add(b2);
-					
+
 					add(t4);
 					add(rb1);
 					add(rb2);
@@ -1194,7 +1201,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 					t6.setText("0");
 					t7.setText("0");
 					t8.setText("0");
-					
+
 					add(b5);
 					b5.setText("全体変換");
 				}else if (cb.getSelectedItem() == "グラデーション") { // Gradation
@@ -1227,12 +1234,9 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 					rb9.setText("REFLECT");
 					rb11.setText("REPEAT");
 					rb8.setSelected(true);
-					add(rb1);
-					add(rb2);
 					rb1.setText("描く");
 					rb2.setText("始点設定");
 					rb1.setSelected(true);
-					rb2.setEnabled(false);
 					DrawPanel.centerx = -1;
 					DrawPanel.centery = -1;
 				}else if (cb.getSelectedItem() == "水平線") { // HorizonLine
@@ -1363,8 +1367,12 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 					s2.setValue(sikiisize*14);
 					s2.revalidate();
 					add(t2);
+					t2.setText("5");
 					l2.setText("しきい値");
 					t2.setText(String.valueOf(sikiisize));
+					add(cb2);
+					cb2.setText("同色全体塗りつぶし");
+					cb2.setSelected(false);
 				}
 			}
 		}
@@ -1379,7 +1387,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 			}
 		}else if (e.getSource() == s2) {
 			if(s2.getValue() != 1){
-				if(PaintTool.getType() == 21){
+				if(PaintTool.type == 21){
 					t2.setText(String.valueOf(s2.getValue()/14));
 				}else{
 					t2.setText(String.valueOf((float)s2.getValue()/10000.0));
@@ -1395,9 +1403,9 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 			}
 		}
 	}
-	
+
 	public void changeSelectTool(){
-		switch(PaintTool.getType()){
+		switch(PaintTool.type){
 		case 0:
 			size = Integer.parseInt(t1.getText());
 			break;
@@ -1510,7 +1518,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 		PaintTool.comand = 5;
 		PaintTool.rewrite();
 		l3.setText("");
-		
+
 		cb.setSelectedItem("選択ツール");
 		PaintTool.setType(12);
 		add(b1);
@@ -1560,7 +1568,7 @@ public class ToolPanel extends JPanel implements ActionListener, ChangeListener 
 			PaintTool.capture();
 		}
 	}
-	
+
 }
 
 

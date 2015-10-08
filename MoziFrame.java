@@ -16,8 +16,8 @@ public class MoziFrame extends JFrame implements ActionListener {
 
 	public JRadioButton rb1, rb2, rb3;
 	public static JRadioButton rb4, rb5, rb6;
-	public JComboBox cb;
-	public static JComboBox cb2;
+	public JComboBox<String> cb;
+	public static JComboBox<String> cb2;
 	private ButtonGroup gr, gr2;
 	private JTextField t1, t2;
 	private JLabel l1, l2, l3, l4;
@@ -61,7 +61,7 @@ public class MoziFrame extends JFrame implements ActionListener {
 		l1 = new JLabel("サイズ");
 		l2 = new JLabel("文字");
 		l3 = new JLabel("フォント");
-		cb = new JComboBox();
+		cb = new JComboBox<String>();
 		cb.addItem("MSゴシック");
 		cb.addItem("MS明朝");
 		cb.addItem("HG行書体");
@@ -71,7 +71,7 @@ public class MoziFrame extends JFrame implements ActionListener {
 		cb.addItem("Blackadder ITC");
 		cb.addItem("Burnstown Dam");
 
-		cb2 = new JComboBox();
+		cb2 = new JComboBox<String>();
 		cb2.addItem("左上");
 		cb2.addItem("上");
 		cb2.addItem("右上");

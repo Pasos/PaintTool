@@ -17,7 +17,7 @@ import javax.swing.JScrollPane;
 public class HistoryFrame extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 2L;
-	public static JList ls;
+	public static JList<String> ls;
 	static String[] listname;
 
 	/*★★入出力系★★*/
@@ -54,7 +54,7 @@ public class HistoryFrame extends JFrame implements ActionListener {
 		Container c = getContentPane();
 		c.setLayout(new BorderLayout());
 		listname = new String[PaintTool.HistoryNUM];
-		ls = new JList(listname);
+		ls = new JList<String>(listname);
 		JScrollPane sp = new JScrollPane();
 		sp.getViewport().setView(ls);
 		sp.setPreferredSize(new Dimension(200,160));
@@ -77,7 +77,7 @@ public class HistoryFrame extends JFrame implements ActionListener {
 				}
 			}
 		 };
-		 
+
 		 addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent e) {
 					PaintTool.historym.setSelected(false);
@@ -89,7 +89,7 @@ public class HistoryFrame extends JFrame implements ActionListener {
 				public void windowOpened(WindowEvent e) {
 				}
 			});
-		 
+
 		 ls.addMouseListener(mouseListener);
 		 setResizable(false);
 		 setVisible(false);

@@ -7,6 +7,7 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
@@ -21,7 +22,8 @@ public class SelectOptionFrame extends JFrame implements ActionListener, ChangeL
 
 	static public JRadioButton rb1, rb2, rb3, rb4, rb5, rb6, rb7, rb8, rb9, rb10, rb11;
 	private ButtonGroup gr1, gr2, gr3;
-	private JLabel l1, l2, l3, l4, l5, l6, l7;
+	private JLabel l1, l2, l3, l4, l5, l6, l7, l8;
+	static public JComboBox<String> cb;
 	static public JTextField t1, t2, t3, t4;
 	public static JSlider s, s2, s3;
 	public static JButton b;
@@ -56,7 +58,7 @@ public class SelectOptionFrame extends JFrame implements ActionListener, ChangeL
 	SelectOptionFrame() {
 
 	    setTitle("選択ツールOption");
-	    setSize(240, 320);
+	    setSize(240, 395);
 	    Container c = getContentPane();
 	    c.setLayout(new FlowLayout());
 
@@ -78,6 +80,7 @@ public class SelectOptionFrame extends JFrame implements ActionListener, ChangeL
 		l5 = new JLabel("画数");
 		l6 = new JLabel("しきい値");
 		l7 = new JLabel("繰り抜き省略サイズ");
+		l8 = new JLabel("●重ね方                 ");
 		t1 = new JTextField("1.0",5);
 		t2 = new JTextField("3",2);
 		t3 = new JTextField("0",5);
@@ -87,6 +90,16 @@ public class SelectOptionFrame extends JFrame implements ActionListener, ChangeL
 		s3 = new JSlider(SwingConstants.HORIZONTAL, 0, 10000, 10000);
 		b = new JButton("選択範囲開放");
 		b.setEnabled(false);
+		cb = new JComboBox<String>();
+		cb.setMaximumRowCount(7);
+		cb.addItem("上書き");
+		cb.addItem("乗算");
+		cb.addItem("スクリーン");
+		cb.addItem("オーバーレイ");
+		cb.addItem("ソフトライト");
+		cb.addItem("ハードライト");
+		cb.addItem("覆い焼き");
+
 		add(l1);
 		add(rb1);
 		add(rb2);
@@ -109,6 +122,8 @@ public class SelectOptionFrame extends JFrame implements ActionListener, ChangeL
 		add(rb5);
 		add(rb6);
 		add(rb7);
+		add(l8);
+		add(cb);
 		add(l4);
 		add(t1);
 		add(s3);
@@ -128,9 +143,9 @@ public class SelectOptionFrame extends JFrame implements ActionListener, ChangeL
 		gr3.add(rb5);
 		gr3.add(rb6);
 		gr3.add(rb7);
-		
-		
-		
+
+
+
 		 addWindowListener(new WindowAdapter() {
 				public void windowClosing(WindowEvent e) {
 					PaintTool.selectm.setSelected(false);
@@ -142,7 +157,7 @@ public class SelectOptionFrame extends JFrame implements ActionListener, ChangeL
 				public void windowOpened(WindowEvent e) {
 				}
 			});
-		
+
 		l5.setEnabled(false);
 		t2.setEnabled(false);
 		l6.setEnabled(false);
@@ -215,7 +230,7 @@ public class SelectOptionFrame extends JFrame implements ActionListener, ChangeL
 			t4.setEnabled(false);
 			s.setEnabled(false);
 			s2.setEnabled(false);
-			if(PaintTool.getType() == 12){
+			if(PaintTool.type == 12){
 				PaintTool.p1.remove(ToolPanel.b9);
 				ToolPanel.b9.setEnabled(false);
 				PaintTool.p1.repaint();
@@ -230,7 +245,7 @@ public class SelectOptionFrame extends JFrame implements ActionListener, ChangeL
 			t4.setEnabled(false);
 			s.setEnabled(false);
 			s2.setEnabled(false);
-			if(PaintTool.getType() == 12){
+			if(PaintTool.type == 12){
 				PaintTool.p1.remove(ToolPanel.b9);
 				ToolPanel.b9.setEnabled(false);
 				PaintTool.p1.repaint();
@@ -245,7 +260,7 @@ public class SelectOptionFrame extends JFrame implements ActionListener, ChangeL
 			t4.setEnabled(false);
 			s.setEnabled(false);
 			s2.setEnabled(false);
-			if(PaintTool.getType() == 12){
+			if(PaintTool.type == 12){
 				PaintTool.p1.remove(ToolPanel.b9);
 				ToolPanel.b9.setEnabled(false);
 				PaintTool.p1.repaint();
@@ -260,7 +275,7 @@ public class SelectOptionFrame extends JFrame implements ActionListener, ChangeL
 			t4.setEnabled(false);
 			s.setEnabled(false);
 			s2.setEnabled(false);
-			if(PaintTool.getType() == 12){
+			if(PaintTool.type == 12){
 				PaintTool.p1.add(ToolPanel.b9);
 				ToolPanel.b9.setEnabled(false);
 				PaintTool.p1.repaint();
@@ -275,7 +290,7 @@ public class SelectOptionFrame extends JFrame implements ActionListener, ChangeL
 			t4.setEnabled(true);
 			s.setEnabled(true);
 			s2.setEnabled(true);
-			if(PaintTool.getType() == 12){
+			if(PaintTool.type == 12){
 				PaintTool.p1.remove(ToolPanel.b9);
 				PaintTool.p1.repaint();
 				DrawPanel.pcnt2 = 0;
@@ -310,6 +325,8 @@ public class SelectOptionFrame extends JFrame implements ActionListener, ChangeL
 				PaintTool.comand = 13;
 				PaintTool.rewrite();
 			}
+		}else if (e.getSource() == cb) {
+			PaintTool.p3.repaint();
 		}
 	}
 

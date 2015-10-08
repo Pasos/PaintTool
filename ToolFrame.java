@@ -13,18 +13,18 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 
 	ImageIcon i1,i2,i3,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15,i16,i17,i18,i19,i21,i22,i23,i24,i25,i26;
 	JButton b1,b2,b3,b5,b6,b7,b8,b9,b10,b11,b12,b13,b14,b15,b16,b17,b18,b19,b21,b22,b23,b24,b25,b26;
-	
+
 	void visible(){
 		setVisible(true);
 	}
 	void invisible(){
 		setVisible(false);
 	}
-	
+
 	/*★★コンストラクタ★★*/
 	ToolFrame() {
-		
-		
+
+
 		setTitle("ツール");
 		setSize(150, 248);
 		Container c = getContentPane();
@@ -149,8 +149,8 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 		add(b21);
 		add(b22);
 		add(b23);
-		
-		
+
+
 		b1.addActionListener(this);
 		b2.addActionListener(this);
 		b3.addActionListener(this);
@@ -175,15 +175,15 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 		b24.addActionListener(this);
 		b25.addActionListener(this);
 		b26.addActionListener(this);
-		
+
 		setResizable(false);
 		setVisible(false);
 	}
-	
-	
-	
+
+
+
 	public void actionPerformed(ActionEvent e) {
-		switch(PaintTool.getType()){
+		switch(PaintTool.type){
 		case 0:
 			ToolPanel.size = Integer.parseInt(PaintTool.p1.t1.getText());
 			break;
@@ -414,7 +414,7 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 			ToolPanel.l9.setText("太さ");
 			PaintTool.p1.add(PaintTool.p1.t4);
 			PaintTool.p1.t4.setText(Integer.toString(ToolPanel.size));
-			
+
 			PaintTool.p1.add(ToolPanel.l4);
 			PaintTool.p1.add(PaintTool.p1.t3);
 			PaintTool.p1.add(ToolPanel.l5);
@@ -963,6 +963,9 @@ public class ToolFrame  extends JFrame  implements ActionListener{
 			PaintTool.p1.add(PaintTool.p1.t2);
 			ToolPanel.l2.setText("しきい値");
 			PaintTool.p1.t2.setText("5");
+			PaintTool.p1.add(ToolPanel.cb2);
+			ToolPanel.cb2.setText("同色全体塗りつぶし");
+			ToolPanel.cb2.setSelected(false);
 		}
 	}
 
